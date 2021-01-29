@@ -118,7 +118,7 @@
     <script type="text/javascript">
         // 百度地图API功能
         var map = new BMap.Map('map', { enableMapClick: false });
-        map.centerAndZoom(new BMap.Point(120.575588, 31.275412), 15);  // 初始化地图,设置中心点坐标和地图级别
+        map.centerAndZoom(new BMap.Point(113.554844,34.835675), 15);  // 初始化地图,设置中心点坐标和地图级别
         //map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
         map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
         map.enableContinuousZoom(true);    //启用地图惯性拖拽，默认禁用
@@ -197,23 +197,17 @@
                 } else {
                     jsonMsg = message;
                 }
-                var p = document.createElement('p');
-                if (pStyle == "color:green") {
-                    pStyle = "color:blue";
-                } else {
-                    pStyle = "color:green";
-                }
-                p.style = pStyle;
-                p.innerText = jsonMsg;
                 path=jsonMsg;
                 pathList=message;
-                logger.appendChild(p);
                 myGeo.getLocation(new BMapGL.Point(pathList[0].lng,pathList[0].lat), function(result){
                     if (result){
                         var8=result.addressComponents;
                         console.log(var8);
+                        $("#parkingRegionName").val(result.addressComponents.street
+                            +result.addressComponents.streetNumber);
                     }
                 });
+
             }
         })();
 
@@ -233,18 +227,20 @@
                     return;
                 }
                 console.log("###############"+var8);
-                console.log("var8.province"+var8.province);
+                console.log("var8.street"+var8.street);
                 parkingRegion ={
                     "parkingRegionCapacity":$("#parkingRegionCapacity").val(),
                     "parkingRegionName":$("#parkingRegionName").val(),
                     "parkingRegionLongLati":path,
                     "province":var8.province,
                     "city":var8.city,
-                    "district":var8.district
+                    "district":var8.district,
+                    "street":var8.street,
+                    "streetNumber":var8.streetNumber
                 }
                 $.ajax({
                     type: "POST",
-                    url: "addRegion",           //这是后台的url
+                    url: "addRegion",
                     data: JSON.stringify(parkingRegion),
                     contentType:"application/json;charset=utf-8",
                     dataType : "application/json",

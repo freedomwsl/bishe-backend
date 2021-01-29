@@ -58,6 +58,15 @@ public class RegionController {
     @PostMapping("/map/addRegion")
     public R addRegion(@RequestBody ParkingRegion parkingRegion){
         logger.info("{}",parkingRegion);
+        if("".equals(parkingRegion.getParkingRegionName())){
+            StringBuffer stringBuffer = new StringBuffer();
+            stringBuffer.append(parkingRegion.getProvince()).append(parkingRegion.getCity())
+                    .append(parkingRegion.getDistrict()).append(parkingRegion.getStreet())
+                    .append(parkingRegion.getStreetNumber());
+            String str=stringBuffer.toString();
+            parkingRegion.setParkingRegionName(str);
+        }
+        regionService.save(parkingRegion);
         return R.success().message("添加成功");
     }
 }

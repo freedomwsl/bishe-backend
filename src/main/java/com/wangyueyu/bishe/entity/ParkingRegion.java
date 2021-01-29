@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.data.annotation.Transient;
 
 /**
  * <p>
@@ -50,6 +51,13 @@ public class ParkingRegion implements Serializable {
 
     @ApiModelProperty(value = "区")
     private String district;
+    @TableField(exist = false)
+    @ApiModelProperty(value = "街道")
+    private String street;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "号码")
+    private String streetNumber;
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)
