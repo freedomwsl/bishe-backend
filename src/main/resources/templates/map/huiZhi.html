@@ -2,11 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
-    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet" />
-    <link th:href="@{/font-awesome/css/font-awesome.css}" rel="stylesheet" />
-    <link th:href="@{/css/style.css}" rel="stylesheet" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no"/>
+    <link th:href="@{/css/bootstrap.min.css}" rel="stylesheet"/>
+    <link th:href="@{/font-awesome/css/font-awesome.css}" rel="stylesheet"/>
+    <link th:href="@{/css/style.css}" rel="stylesheet"/>
 
     <link th:href="@{/css/plugins/iCheck/custom.css}" rel="stylesheet"/>
     <link th:href="@{/css/plugins/footable/footable.core.css}" rel="stylesheet"/>
@@ -71,13 +71,15 @@
             display: none
         }
     </style>
-    <script type="text/javascript" src="//api.map.baidu.com/api?v=3.0&ak=IsP2hS57WxEhq9wGXOPRxpmqctE6RKTY"></script>
+    <script type="text/javascript"
+            src="http://api.map.baidu.com/api?v=3.0&ak=IsP2hS57WxEhq9wGXOPRxpmqctE6RKTY"></script>
     <!--加载鼠标绘制工具-->
     <script type="text/javascript"
-        src="//api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
-    <link rel="stylesheet" href="//api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
-    <script type="text/javascript" src="//api.map.baidu.com/api?type=webgl&v=1.0&ak=IsP2hS57WxEhq9wGXOPRxpmqctE6RKTY"></script>
-    <script src="//libs.baidu.com/jquery/1.9.0/jquery.js"></script>
+            src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+    <link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css"/>
+    <script type="text/javascript"
+            src="http://api.map.baidu.com/api?type=webgl&v=1.0&ak=IsP2hS57WxEhq9wGXOPRxpmqctE6RKTY"></script>
+    <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
     <!--加载检索信息窗口-->
     <!-- <script type="text/javascript"
         src="http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.js"></script>
@@ -87,172 +89,206 @@
 
 <body>
 
-    <div id="allmap" style="overflow:hidden;zoom:1;position:relative;">
-        <div id="map" style="height:100%;-webkit-transition: all 0.5s ease-in-out;transition: all 0.5s ease-in-out;">
+<div id="allmap" style="overflow:hidden;zoom:1;position:relative;">
+    <div id="map" style="height:100%;-webkit-transition: all 0.5s ease-in-out;transition: all 0.5s ease-in-out;">
 
-        </div>
     </div>
-    <div id="regionForm" class="ibox-content" style="overflow: hidden;position: absolute;z-index: 100;top:5%;">
-        <form>
-            <div class="row">
-                <div class="col-sm-4 m-b-xs">
-                    <input id="parkingRegionCapacity" name="parkingRegionCapacity" placeholder="区域容量" class="form-control" type="text"/>
-                </div>
-                <div class="col-sm-4 m-b-xs">
-                    <input id="parkingRegionName" name="parkingRegionName" class="form-control" type="text"  placeholder="区域名称" />
-                </div>
-                <div class="col-sm-4 m-b-xs">
-                    <button id="submitButton" class="btn btn-primary btn-block" type="button"><i class="fa fa-search"></i>&nbsp;&nbsp;&nbsp;&nbsp;<strong>添加</strong></button>
-                </div>
+</div>
+<div id="regionForm" class="ibox-content" style="overflow: hidden;position: absolute;z-index: 100;top:5%;">
+    <form>
+        <div class="row">
+            <div class="col-sm-4 m-b-xs">
+                <input id="parkingRegionCapacity" name="parkingRegionCapacity" placeholder="区域容量" class="form-control"
+                       type="text"/>
             </div>
-        </form>
-    </div>
-    <div id="result" style="overflow: hidden;position: absolute;z-index: 100;top:95%;">
-        <input type="button" value="获取绘制的覆盖物个数" onclick="alert(overlays.length)" class="btn" />
-        <input type="button" value="清除所有覆盖物" onclick="clearAll()" class="btn" />
-        <input type="button" value="获取绘制区域点集" onclick="getpoints()" class="btn" />
+            <div class="col-sm-4 m-b-xs">
+                <input id="parkingRegionName" name="parkingRegionName" class="form-control" type="text"
+                       placeholder="区域名称"/>
+            </div>
+            <div class="col-sm-4 m-b-xs">
+                <button id="submitButton" class="btn btn-primary btn-block" type="button"><i class="fa fa-search"></i>&nbsp;&nbsp;&nbsp;&nbsp;<strong>添加</strong>
+                </button>
+            </div>
+        </div>
 
-        <div id="logParent" style="background-color: white;"></div>
+    </form>
+</div>
+<div id="result" style="overflow: hidden;position: absolute;z-index: 100;top:95%;">
+    <input type="button" value="获取绘制的覆盖物个数" onclick="alert(overlays.length)" class="btn"/>
+    <input type="button" value="清除所有覆盖物" onclick="clearAll()" class="btn"/>
+    <input type="button" value="获取绘制区域点集" onclick="getpoints()" class="btn"/>
 
-    </div>
-    <script type="text/javascript">
-        // 百度地图API功能
-        var map = new BMap.Map('map', { enableMapClick: false });
-        map.centerAndZoom(new BMap.Point(113.554844,34.835675), 15);  // 初始化地图,设置中心点坐标和地图级别
-        //map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
-        map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
-        map.enableContinuousZoom(true);    //启用地图惯性拖拽，默认禁用
-        map.addControl(new BMap.NavigationControl());  //添加默认缩放平移控件
-        map.addControl(new BMap.ScaleControl({ anchor: BMAP_ANCHOR_BOTTOM_LEFT })); //向地图中添加比例尺控件
-        var overlays = [];
-        let path;
-        var overlaycomplete = function (e) {
-            var overlay = e.overlay;
-            overlays.push(overlay);
-            var markerMenu = new BMap.ContextMenu();
-            markerMenu.addItem(new BMap.MenuItem('移除', () => {
-                map.removeOverlay(overlay);
-            }));
-            overlay.addContextMenu(markerMenu);
-        };
-        var polygoncomplete = function (e, overlay) {
-            mylog(overlay.getPath())
-        };
-        var polylinecomplete = function (e, overlay) {
-            mylog(overlay.getPath());
+    <div id="logParent" style="background-color: white;"></div>
 
-        };
-        var markercomplete = function (e, overlay) {
-            mylog(overlay.getPosition())
-        };
-        var styleOptions = {
-            strokeColor: "red",    //边线颜色。
-            fillColor: "red",      //填充颜色。当参数为空时，圆形将没有填充效果。
-            strokeWeight: 3,       //边线的宽度，以像素为单位。
-            strokeOpacity: 0.8,	   //边线透明度，取值范围0 - 1。
-            fillOpacity: 0.6,      //填充的透明度，取值范围0 - 1。
-            strokeStyle: 'solid' //边线的样式，solid或dashed。
-        }
-        //实例化鼠标绘制工具
-        var drawingManager = new BMapLib.DrawingManager(map, {
-            isOpen: false, //是否开启绘制模式
-            enableDrawingTool: true, //是否显示工具栏
-            drawingToolOptions: {
-                anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
-                offset: new BMap.Size(5, 5), //偏离值
-            },
-            circleOptions: styleOptions, //圆的样式
-            polylineOptions: styleOptions, //线的样式
-            polygonOptions: styleOptions, //多边形的样式
-            rectangleOptions: styleOptions //矩形的样式
-        });
-        //添加鼠标绘制工具监听事件，用于获取绘制结果
-        drawingManager.addEventListener('overlaycomplete', overlaycomplete);
-        drawingManager.addEventListener('polygoncomplete', polygoncomplete);
-        drawingManager.addEventListener('polylinecomplete', polylinecomplete);
-        drawingManager.addEventListener('markercomplete', markercomplete);
-        function clearAll() {
-            for (var i = 0; i < overlays.length; i++) {
-                map.removeOverlay(overlays[i]);
-            }
-            overlays.length = 0
-            logger.remove();
-            logger = document.createElement('div');
-            document.getElementById('logParent').appendChild(logger);
-        }
-        var logger = document.createElement('div');
-        document.getElementById('logParent').appendChild(logger);
-        function getpoints() {
-            console.log(overlays)
-        }
-        var pStyle = "color:green";
-        let pathList =[];
-        var myGeo = new BMapGL.Geocoder();
-        var var8;
-        (function () {
-            mylog = function (message) {
-                var jsonMsg;
-                if (typeof message == 'object') {
-                    jsonMsg = (JSON && JSON.stringify ? JSON.stringify(message): message);
-                } else {
-                    jsonMsg = message;
-                }
-                path=jsonMsg;
-                pathList=message;
-                myGeo.getLocation(new BMapGL.Point(pathList[0].lng,pathList[0].lat), function(result){
-                    if (result){
-                        var8=result.addressComponents;
-                        console.log(var8);
-                        $("#parkingRegionName").val(result.addressComponents.street
-                            +result.addressComponents.streetNumber);
-                    }
-                });
-
-            }
-        })();
-
-        // 根据坐标得到地址描述    下面输入坐标。
-
-        var size = new BMap.Size(80, 20);
-        map.addControl(new BMap.CityListControl({
-            anchor: BMAP_ANCHOR_TOP_LEFT,
-            offset: size,
+</div>
+<script type="text/javascript">
+    // 百度地图API功能
+    var map = new BMap.Map('map', {enableMapClick: false});
+    map.centerAndZoom(new BMap.Point(113.554844, 34.835675), 15);  // 初始化地图,设置中心点坐标和地图级别
+    //map.addControl(new BMap.MapTypeControl());   //添加地图类型控件
+    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+    map.enableContinuousZoom(true);    //启用地图惯性拖拽，默认禁用
+    map.addControl(new BMap.NavigationControl());  //添加默认缩放平移控件
+    map.addControl(new BMap.ScaleControl({anchor: BMAP_ANCHOR_BOTTOM_LEFT})); //向地图中添加比例尺控件
+    var overlays = [];
+    let path;
+    var overlaycomplete = function (e) {
+        var overlay = e.overlay;
+        overlays.push(overlay);
+        var markerMenu = new BMap.ContextMenu();
+        markerMenu.addItem(new BMap.MenuItem('移除', () => {
+            map.removeOverlay(overlay);
         }));
+        overlay.addContextMenu(markerMenu);
+    };
+    var polygoncomplete = function (e, overlay) {
+        mylog(overlay.getPath())
+    };
+    var polylinecomplete = function (e, overlay) {
+        console.log(111);
+        mylog(overlay.getPath());
 
-        var parkingRegion;
-        $(function () {
-            $("#submitButton").on("click", function () {
-                if(path==null){
-                    alert("请先绘制停车区域");
-                    return;
+    };
+    var markercomplete = function (e, overlay) {
+        mylog(overlay.getPosition())
+    };
+    var styleOptions = {
+        strokeColor: "red",    //边线颜色。
+        fillColor: "red",      //填充颜色。当参数为空时，圆形将没有填充效果。
+        strokeWeight: 3,       //边线的宽度，以像素为单位。
+        strokeOpacity: 0.8,	   //边线透明度，取值范围0 - 1。
+        fillOpacity: 0.6,      //填充的透明度，取值范围0 - 1。
+        strokeStyle: 'solid' //边线的样式，solid或dashed。
+    }
+    //实例化鼠标绘制工具
+    var drawingManager = new BMapLib.DrawingManager(map, {
+        isOpen: false, //是否开启绘制模式
+        enableDrawingTool: true, //是否显示工具栏
+        drawingToolOptions: {
+            anchor: BMAP_ANCHOR_TOP_RIGHT, //位置
+            offset: new BMap.Size(5, 5), //偏离值
+        },
+        circleOptions: styleOptions, //圆的样式
+        polylineOptions: styleOptions, //线的样式
+        polygonOptions: styleOptions, //多边形的样式
+        rectangleOptions: styleOptions //矩形的样式
+    });
+    //添加鼠标绘制工具监听事件，用于获取绘制结果
+    drawingManager.addEventListener('overlaycomplete', overlaycomplete);
+    drawingManager.addEventListener('polygoncomplete', polygoncomplete);
+    drawingManager.addEventListener('polylinecomplete', polylinecomplete);
+    drawingManager.addEventListener('markercomplete', markercomplete);
+
+    function clearAll() {
+        for (var i = 0; i < overlays.length; i++) {
+            map.removeOverlay(overlays[i]);
+        }
+        overlays.length = 0
+        logger.remove();
+        logger = document.createElement('div');
+        document.getElementById('logParent').appendChild(logger);
+    }
+
+    var logger = document.createElement('div');
+    document.getElementById('logParent').appendChild(logger);
+
+    function getpoints() {
+        console.log(overlays)
+    }
+
+    var pStyle = "color:green";
+    let pathList = [];
+    var myGeo = new BMapGL.Geocoder();
+    var var8;
+    (function () {
+        mylog = function (message) {
+            console.log(222);
+            console.log(message);
+            var jsonMsg;
+            if (typeof message == 'object') {
+                jsonMsg = (JSON && JSON.stringify ? JSON.stringify(message) : message);
+            } else {
+                jsonMsg = message;
+            }
+            console.log(jsonMsg);
+            path = jsonMsg;
+            pathList = message;
+            console.log(typeof(pathList));
+            myGeo.getLocation(new BMapGL.Point(pathList[0].lng, pathList[0].lat), function (result) {
+                console.log(result);
+                if (result) {
+
+                    var8 = result.addressComponents;
+                    console.log(var8);
+                    $("#parkingRegionName").val(result.addressComponents.street
+                        + result.addressComponents.streetNumber);
                 }
-                console.log("###############"+var8);
-                console.log("var8.street"+var8.street);
-                parkingRegion ={
-                    "parkingRegionCapacity":$("#parkingRegionCapacity").val(),
-                    "parkingRegionName":$("#parkingRegionName").val(),
-                    "parkingRegionLongLati":path,
-                    "province":var8.province,
-                    "city":var8.city,
-                    "district":var8.district,
-                    "street":var8.street,
-                    "streetNumber":var8.streetNumber
-                }
-                $.ajax({
-                    type: "POST",
-                    url: "addRegion",
-                    data: JSON.stringify(parkingRegion),
-                    contentType:"application/json;charset=utf-8",
-                    dataType : "application/json",
-                    success: function(respMsg){
-                        alert(respMsg);
-                    }
-                });
             });
 
+        }
+    })();
+
+    // 根据坐标得到地址描述    下面输入坐标。
+
+    var size = new BMap.Size(80, 20);
+    map.addControl(new BMap.CityListControl({
+        anchor: BMAP_ANCHOR_TOP_LEFT,
+        offset: size,
+    }));
+
+    var parkingRegion;
+    $(function () {
+        $("#submitButton").on("click", function () {
+            if (path == null) {
+                alert("请先绘制停车区域");
+                return;
+            }
+            console.log("###############" + var8);
+            console.log("var8.street" + var8.street);
+            // 计算中间位置传给后端存redis
+            var longTotal=0;
+            var latiTotal=0;
+            for (var k = 0; k < pathList.length; k ++) {
+                console.log(pathList[k]);
+                var var4=pathList[k].lng;
+                var var5=pathList[k].lat;
+                longTotal+=var4;
+                latiTotal+=var5;
+            }
+            var longZhong=longTotal/pathList.length;
+            var latiZhong=latiTotal/pathList.length;
+            var centerLocation=[];
+            centerLocation.push(longZhong);
+            centerLocation.push(latiZhong);
+            console.log("centerLocation="+centerLocation);
+            parkingRegion = {
+                "parkingRegionCapacity": $("#parkingRegionCapacity").val(),
+                "parkingRegionName": $("#parkingRegionName").val(),
+                "parkingRegionLongLati": path,
+                "province": var8.province,
+                "city": var8.city,
+                "district": var8.district,
+                "street": var8.street,
+                "streetNumber": var8.streetNumber,
+                "centerLocation": centerLocation
+            }
+            $.ajax({
+                type: "POST",
+                url: "addRegion",
+                data: JSON.stringify(parkingRegion),
+                contentType: "application/json;charset=utf-8",
+                dataType: "application/json",
+                success: function (respMsg) {
+                    alert(respMsg);
+                }
+            });
+            map.clearOverlays();
         });
 
-    </script>
+    });
+
+
+</script>
 </body>
 
 </html>

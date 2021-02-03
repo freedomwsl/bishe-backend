@@ -32,5 +32,17 @@ public class RedirectController {
         logger.info("#############");
         return "/map/根据一串坐标绘制";
     }
-
+    @GetMapping("/user/addRegion")
+    public String addRegion(Model model) {
+        logger.info("#############");
+        return "/map/huiZhi";
+    }
+    @GetMapping("/map/ceshi")
+    public String ceshi(){
+        return "/map/ceshi";
+    }
+    @GetMapping("/map/ceshi2")
+    public String ceshi2(){
+        return "/map/ceshi2";
+    }
 }

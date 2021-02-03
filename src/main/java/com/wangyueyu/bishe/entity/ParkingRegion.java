@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -54,6 +55,10 @@ public class ParkingRegion implements Serializable {
     @TableField(exist = false)
     @ApiModelProperty(value = "街道")
     private String street;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "街道")
+    private List<Double> centerLocation;
 
     @TableField(exist = false)
     @ApiModelProperty(value = "号码")

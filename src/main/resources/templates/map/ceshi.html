@@ -26,7 +26,13 @@
     <script th:src="@{/js/umedit/lang/zh-cn/zh-cn.js}"></script>
     <script th:src="@{/js/jquery.min.js}"></script>
     <script include="bootstrap,widgets.alert" th:src="@{/js/include-web.js}"></script>
-    <script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=IsP2hS57WxEhq9wGXOPRxpmqctE6RKTY"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=IsP2hS57WxEhq9wGXOPRxpmqctE6RKTY"></script>
+    <!--加载鼠标绘制工具-->
+    <script type="text/javascript"
+            src="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.js"></script>
+    <link rel="stylesheet" href="http://api.map.baidu.com/library/DrawingManager/1.4/src/DrawingManager_min.css" />
+    <script type="text/javascript" src="http://api.map.baidu.com/api?type=webgl&v=1.0&ak=IsP2hS57WxEhq9wGXOPRxpmqctE6RKTY"></script>
+    <script src="http://libs.baidu.com/jquery/1.9.0/jquery.js"></script>
     <title>交通导航</title>
 
     <script>
@@ -43,7 +49,7 @@
 <body>
 <div id="toolbar" class="panel panel-primary" style="  position: absolute;top: 10px;right: 10px;text-align: center;z-index: 1;border-radius: 4px;">
     <div>
-        <input id="test" type="button" value="测试入口"></input>
+        <input onclick="getRandomBike2()" type="button" value="测试入口"></input>
     </div>
     <div class='panel-heading' id="panelheading">
         <h5 class='panel-title text-center' data-i18n="resources.title_drawGeoGraphicObject">导航功能</h5>
@@ -66,7 +72,7 @@
     </div>
 
     <div>
-        <input type="button" class="btn btn-default" style="width: 230px;margin-bottom: 10px;margin-top: 10px;" value="查询" onclick="buxin()"/>
+        <input type="button" class="btn btn-default" style="width: 230px;margin-bottom: 10px;margin-top: 10px;" value="查询停车点" onclick="findParking()"/>
     </div>
 </div>
 <div id="r-result" style="position: absolute;margin-top: 50px;margin-left: 50px;width: 400px;z-index: 9999;"></div>
@@ -75,45 +81,16 @@
 </body>
 </html>
 <script type="text/javascript">
+    //--------------------------------新项目--------------------------------------
+
+
+    // ----------------------------------老项目的----------------------------------
     function G(id) {
         return document.getElementById(id);
     }
-    //一开始请求所有后台数据
-    $.post("${pageContext.request.contextPath}/travel_getAllplace.action",function (data) {
-        $(data).each(function (i,obj) {
-            var point=obj.BD09;
-            var arr = point.split(",");
-            var point_x=parseFloat(arr[0]);
-            var point_y=parseFloat(arr[1]);
-            var point2=new BMap.Point(point_x,point_y);
-            var myIcon = new BMap.Icon("${ctx}/images/旅游景点.png", new BMap.Size(50,50));
-            var marker2 = new BMap.Marker(point2,{icon:myIcon});  // 创建标注
-            map.addOverlay(marker2);
-            var placename=obj.name;
-            var lab = new BMap.Label(placename,{position:point2});
-            lab.setStyle({
-                color : "red",
-                fontSize : "24px",
-                height : "20px",
-                lineHeight : "20px",
-                fontFamily:"微软雅黑"
-            });
-            map.addOverlay(lab);
-            var sContent =
-                "<h4 style='margin:0 0 5px 0;padding:0.2em 0'>"+obj.name+"</h4>" +
-                "<img style='float:right;margin:4px' id='imgDemo' src='images/travel/"+obj.travel_image+"' width='139' height='104' title='"+obj.name+"'/>" +
-                "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>"+obj.travel_describe+"</p>" +
-                "</div>";
-            var infoWindow = new BMap.InfoWindow(sContent);
-            marker2.addEventListener('mouseover', function(){
-                this.openInfoWindow(infoWindow);
-            });
-            marker2.addEventListener('click',function(){
-                window.open(obj.baidubaike);
-            });
-        });
-    },"json");
-   var mapstyle= [
+    var beginLocation;
+    var endLocation;
+    var mapstyle= [
         {
             "featureType": "road",
             "elementType": "all",
@@ -159,6 +136,14 @@
     ]
     // 百度地图API功能
     var map = new BMap.Map("allmap");    // 创建Map实例
+    var myGeo = new BMapGL.Geocoder();
+    var riding = new BMap.RidingRoute(map, {
+        renderOptions: {
+            map: map,
+            autoViewport: true,
+            panel: "r-result"
+        }
+    });
     map.setMapStyle({
         styleJson:[mapstyle]
     });
@@ -180,42 +165,48 @@
         ]}));
     map.setCurrentCity("北京");          // 设置地图显示的城市 此项是必须设置的
     map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+    function showInfo(e) {
+        map.clearOverlays();    //清除地图上所有覆盖物
+        endLocation=e.point;
+        var marker = new BMap.Marker(e.point); // 创建标注
+        map.addOverlay(marker);
+        // alert('点击位置经纬度：' + e.latlng.lng + ',' + e.latlng.lat);
+    };
 
-
-    var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
-        {"input" : "beginplace"
-            ,"location" : map
-        });
+    // var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
+    //     {"input" : "beginplace"
+    //         ,"location" : map
+    //     });
     var ac2 = new BMap.Autocomplete(    //建立一个自动完成的对象
         {"input" : "endplace"
             ,"location" : map
         });
     var myValue;
-    ac.addEventListener("onhighlight", function(e) {  //鼠标放在下拉列表上的事件
-        var str = "";
-        var _value = e.fromitem.value;
-        var value = "";
-        if (e.fromitem.index > -1) {
-            value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
-        }
-        str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
-
-        value = "";
-        if (e.toitem.index > -1) {
-            _value = e.toitem.value;
-            value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
-        }
-        str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value;
-        G("searchResultPanel").innerHTML = str;
-
-    });
-    ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
-        var _value = e.item.value;
-        myValue = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
-        G("searchResultPanel").innerHTML ="onconfirm<br />index = " + e.item.index + "<br />myValue = " + myValue;
-
-        setPlace();
-    });
+    // ac.addEventListener("onhighlight", function(e) {  //鼠标放在下拉列表上的事件
+    //     var str = "";
+    //     var _value = e.fromitem.value;
+    //     var value = "";
+    //     if (e.fromitem.index > -1) {
+    //         value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+    //     }
+    //     str = "FromItem<br />index = " + e.fromitem.index + "<br />value = " + value;
+    //
+    //     value = "";
+    //     if (e.toitem.index > -1) {
+    //         _value = e.toitem.value;
+    //         value = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+    //     }
+    //     str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value;
+    //     G("searchResultPanel").innerHTML = str;
+    //
+    // });
+    // ac.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+    //     var _value = e.item.value;
+    //     myValue = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
+    //     G("searchResultPanel").innerHTML ="onconfirm<br />index = " + e.item.index + "<br />myValue = " + myValue;
+    //
+    //     setPlace();
+    // });
     ac2.addEventListener("onhighlight", function(e) {  //鼠标放在下拉列表上的事件
 
         var str = "";
@@ -236,11 +227,15 @@
 
     });
     ac2.addEventListener("onconfirm", function(e) {    //鼠标点击下拉列表后的事件
+        console.log(e);
         var _value = e.item.value;
         myValue = _value.province +  _value.city +  _value.district +  _value.street +  _value.business;
         G("searchResultPanel").innerHTML ="onconfirm<br />index = " + e.item.index + "<br />myValue = " + myValue;
         setPlace();
     });
+    // ac2.addEventListener("onclick",function(e){
+    //     console.log(e.point);
+    // });
     function setPlace(){
         map.clearOverlays();    //清除地图上所有覆盖物
         function myFun(){
@@ -273,19 +268,127 @@
                 renderOptions: {map: map, panel: "r-result"}
             });
             transit.search(beginplace, endplace);
-            // var routePolicy = [BMAP_TRANSIT_POLICY_LEAST_TIME,BMAP_TRANSIT_POLICY_LEAST_TRANSFER,BMAP_TRANSIT_POLICY_LEAST_WALKING,BMAP_TRANSIT_POLICY_AVOID_SUBWAYS];
-            // var transit = new BMap.TransitRoute(map, {
-            //     renderOptions: {map: map},
-            //     policy: 0
-            // });
-            //     map.clearOverlays();
-            //     var i=document.getElementById("tiaojian").value;
-            //     search(beginplace,endplace,routePolicy[i]);
-            //     function search(start,end,route){
-            //         transit.setPolicy(route);
-            //         transit.search(start,end);
-            //     }
+
 
         }
     }
+    // ------------------新项目----------------------------
+    function findParking() {
+        console.log(beginLocation);
+        console.log(endLocation);
+
+        riding.search(beginLocation, endLocation);
+        map.removeEventListener('click', showInfo);
+        $.ajax({
+            type: "GET",
+            url: "/map/getRegionsByEnd"+"/"+endLocation.lng+"/"+endLocation.lat,
+            dataType: "json",
+            success: function (respMsg) {
+                console.log("xxxxxxxxxxxxxxxxxxxxx");
+                console.log(respMsg.data.regions.length);
+                for (var k = 0; k < respMsg.data.regions.length; k ++) {
+                    console.log(k);
+                    drawRegions(respMsg.data.regions[k]);
+                }
+            },
+            error: function(respMsg){
+                console.log(respMsg);
+            }
+        });
+    }
+    function drawRegions(e){
+        var var1=e;
+        var var2=JSON.parse(var1.parkingRegionLongLati);
+        // 构成多边形的点的数组
+        var pointArr = [];
+        var longTotal=0;
+        var latiTotal=0;
+        for (var k = 0; k < var2.length; k ++) {
+            var var4=var2[k].lng;
+            var var5=var2[k].lat;
+            longTotal+=var4;
+            latiTotal+=var5;
+            pointArr.push({
+                lng: var4,
+                lat: var5
+            });
+        }
+        var longZhong=longTotal/var2.length;
+        var latiZhong=latiTotal/var2.length;
+        pointArr.push({
+            lng:var2[0].lng,
+            lat:var2[0].lat
+        })
+        // 生成坐标点
+        var trackPoint = [];
+        for (var i = 0, j = pointArr.length; i < j; i++) {
+            trackPoint.push(new BMap.Point(pointArr[i].lng, pointArr[i].lat));
+        }
+        var trackPoint2 = [];
+        trackPoint2.push(new BMap.Point(longZhong,latiZhong));
+        var marker2 = new BMap.Marker(trackPoint2[0]);  // 创建标注
+        map.addOverlay(marker2);
+        var sContent =
+            "<h4 style='margin:0 0 5px 0;padding:0.2em 0'>"+var1.parkingRegionId+"</h4>" +
+            "<img style='float:right;margin:4px' id='imgDemo' th:src='/img/bike/共享单车.png' width='139' height='104' title='"+var1.parkingRegionCapacity+"'/>" +
+            "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>"+var1.parkingRegionName+"</p>" +
+            "</div>";
+        var infoWindow = new BMap.InfoWindow(sContent);
+        marker2.addEventListener('mouseover', function(){
+            this.openInfoWindow(infoWindow);
+        });
+
+        // 画线
+        var polyline = new BMap.Polyline(trackPoint, {
+            strokeColor: "#ad0e21",
+            strokeWeight: 3,
+            setStrokeStyle:"dashed",
+            strokeOpacity: 1
+        });
+        map.addOverlay(polyline);
+        // 配置图片
+        var size = new BMap.Size(22, 22);
+        var offset = new BMap.Size(0, 0);
+        var imageSize = new BMap.Size(20, 20);
+
+        // 画图标
+        // for (var i = 0, j = trackPoint.length; i < j; i++) {
+        //     var marker = new BMap.Marker(trackPoint[i], {
+        //         offset: offset
+        //     }); // 创建标注
+        //     map.addOverlay(marker);
+        //     marker.addEventListener("click",function () {
+        //         // alert(this.getPosition())
+        //         var point=this.getPosition();
+        //         alert("经度："+point.lng+"\n"+"纬度："+point.lat)
+        //     })
+        // }
+    };
+    (function() {
+        getRandomBike2 = function () {
+            console.log("getRandomBike");
+            $.get("/test/getRandomBike", function (response) {
+                console.log("response" + response);
+                let location = response.data.bike.longLati;
+
+                let s = location.split(",");
+                console.log(s);
+                console.log(s[0], s[1]);
+                let point = new BMap.Point(parseFloat(s[0]), parseFloat(s[1]));
+                beginLocation=point;
+                myGeo.getLocation(new BMapGL.Point(parseFloat(s[0]), parseFloat(s[1])), function (result) {
+                    console.log(result);
+                    if (result) {
+                        $("#beginplace").val(result.address);
+                    }
+                });
+                var marker = new BMap.Marker(point); // 创建标注
+                map.addOverlay(marker);
+                map.centerAndZoom(point, 14);  // 初始化地图,设置中心点坐标和地图级别
+                alert("请在右边输入框输入目的地,然后点击你想去的地方");
+                map.addEventListener('click', showInfo);
+            }, "json");
+        }
+    })();
+
 </script>

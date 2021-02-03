@@ -4,7 +4,9 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wangyueyu.bishe.entity.Bike;
 import com.wangyueyu.bishe.service.BikeService;
+import com.wangyueyu.bishe.util.R;
 import com.wangyueyu.bishe.util.jasper.PageUtil;
+import com.wangyueyu.bishe.util.redisUtil.RandomLocationUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 /**
  * description
@@ -70,4 +73,22 @@ public class Bike1Controller {
         bikeService.removeById(id);
         return "成功";
     }
+    @ResponseBody
+    @GetMapping("/test/getRandomBike")
+    public R getRandomBike(){
+        QueryWrapper<Bike> wrapper = new QueryWrapper<>();
+        wrapper.isNotNull("long_lati");
+        wrapper.eq("is_using","N");
+        List<Bike> list = bikeService.list(wrapper);
+        Bike bike = list.get(0);
+        logger.info("getRandomBike");
+        return R.success().data("bike",bike);
+    }
+    @ResponseBody
+    @PostMapping("/bike/addBike")
+    public R addBike(@RequestBody Bike bike){
+        bikeService.saveBike(bike);
+        return R.success();
+    }
+
 }

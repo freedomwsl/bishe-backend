@@ -21,14 +21,10 @@
     map.centerAndZoom(point, 15);
     map.enableScrollWheelZoom(); // 开启鼠标滚轮缩放
     map.addControl(new BMap.ScaleControl()); // 添加比例尺控件
-
-    var pointStr = "104.038748,30.641821,104.047789,30.648128,104.063959,30.655336,104.067264,30.660307,104.067264,30.664438,104.064008,30.665316".split(",");
+    // 根据传过来的region在地图上绘制区域
     var var1=[[${region}]];
-
     var var2=JSON.parse(var1.parkingRegionLongLati);
-
-
-    console.log(var2);
+    // 构成多边形的点的数组
     var pointArr = [];
     var longTotal=0;
     var latiTotal=0;
@@ -82,8 +78,6 @@
     var offset = new BMap.Size(0, 0);
     var imageSize = new BMap.Size(20, 20);
 
-
-
     // 画图标
     for (var i = 0, j = trackPoint.length; i < j; i++) {
         var marker = new BMap.Marker(trackPoint[i], {
@@ -96,7 +90,6 @@
             var point=this.getPosition();
             alert("经度："+point.lng+"\n"+"纬度："+point.lat)
         })
-
     }
 
     //根据经纬极值计算绽放级别。 (从网上复制)
@@ -113,7 +106,7 @@
     }
 
     //  (从网上复制)
-    function setZoom(points) {
+    function setZoom( ) {
         if (points.length > 0) {
             var maxLng = points[0].lng;
             var minLng = points[0].lng;

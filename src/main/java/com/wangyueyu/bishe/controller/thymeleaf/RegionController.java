@@ -4,17 +4,22 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wangyueyu.bishe.entity.Bike;
 import com.wangyueyu.bishe.entity.ParkingRegion;
+import com.wangyueyu.bishe.mapper.ParkingRegionMapper;
 import com.wangyueyu.bishe.service.ParkingRegionService;
 import com.wangyueyu.bishe.util.R;
 import com.wangyueyu.bishe.util.jasper.PageUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.joda.time.ReadableInstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -26,6 +31,8 @@ import java.util.List;
 public class RegionController {
     @Autowired
     private ParkingRegionService regionService;
+    @Resource
+    private ParkingRegionMapper parkingRegionMapper;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     @RequestMapping("/user/regionManage_{pageCurrent}_{pageSize}_{pageCount}")
     public String itemManage(@PathVariable Integer pageCurrent, @PathVariable Integer pageSize,
@@ -58,15 +65,16 @@ public class RegionController {
     @PostMapping("/map/addRegion")
     public R addRegion(@RequestBody ParkingRegion parkingRegion){
         logger.info("{}",parkingRegion);
-        if("".equals(parkingRegion.getParkingRegionName())){
-            StringBuffer stringBuffer = new StringBuffer();
-            stringBuffer.append(parkingRegion.getProvince()).append(parkingRegion.getCity())
-                    .append(parkingRegion.getDistrict()).append(parkingRegion.getStreet())
-                    .append(parkingRegion.getStreetNumber());
-            String str=stringBuffer.toString();
-            parkingRegion.setParkingRegionName(str);
-        }
-        regionService.save(parkingRegion);
+        regionService.saveToRedisAndMysql(parkingRegion);
         return R.success().message("添加成功");
+    }
+    @ResponseBody
+    @GetMapping("/map/getRegionsByEnd/{lon}/{lat}")
+    public R getRegionsByEnd(@PathVariable Double lon,@PathVariable Double lat){
+        ArrayList<Double> doubles = new ArrayList<>();
+        doubles.add(lon);
+        doubles.add(lat);
+        List<ParkingRegion> regions = regionService.getRegionsByEnd(doubles);
+        return R.success().data("regions",regions);
     }
 }

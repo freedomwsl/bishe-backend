@@ -13,4 +13,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface BikeService extends IService<Bike> {
 
+    void saveBike(Bike bike);
 }

@@ -3,6 +3,8 @@ package com.wangyueyu.bishe.service;
 import com.wangyueyu.bishe.entity.ParkingRegion;
 import com.baomidou.mybatisplus.extension.service.IService;
 
+import java.util.List;
+
 /**
  * <p>
  *  服务类
@@ -13,4 +15,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface ParkingRegionService extends IService<ParkingRegion> {
 
+    void saveToRedisAndMysql(ParkingRegion parkingRegion);
+
+    List<ParkingRegion> getRegionsByEnd(List<Double> lonAndLati);
 }
