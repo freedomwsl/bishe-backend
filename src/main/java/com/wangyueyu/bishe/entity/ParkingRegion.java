@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
+
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -17,7 +18,7 @@ import org.springframework.data.annotation.Transient;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author wangyueyu
@@ -26,7 +27,7 @@ import org.springframework.data.annotation.Transient;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="ParkingRegion对象", description="")
+@ApiModel(value = "ParkingRegion对象", description = "")
 public class ParkingRegion implements Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -57,12 +58,19 @@ public class ParkingRegion implements Serializable {
     private String street;
 
     @TableField(exist = false)
-    @ApiModelProperty(value = "街道")
+    @ApiModelProperty(value = "中间位置，存redis")
     private List<Double> centerLocation;
 
     @TableField(exist = false)
     @ApiModelProperty(value = "号码")
     private String streetNumber;
+    @TableField(exist = false)
+    @ApiModelProperty(value = "已经使用的容量，存redis")
+    private Integer usedCapacity;
+
+    @TableField(exist = false)
+    @ApiModelProperty(value = "是否为推荐点")
+    private String isRecommend;
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)

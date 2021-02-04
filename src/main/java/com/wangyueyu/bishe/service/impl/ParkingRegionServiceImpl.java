@@ -21,7 +21,7 @@ import java.util.function.LongToIntFunction;
 
 /**
  * <p>
- *  服务实现类
+ * 服务实现类
  * </p>
  *
  * @author wangyueyu
@@ -30,54 +30,70 @@ import java.util.function.LongToIntFunction;
 @Service
 @Slf4j
 public class ParkingRegionServiceImpl extends ServiceImpl<ParkingRegionMapper, ParkingRegion> implements ParkingRegionService {
-    public static final String REGION_REDIS_KEY="parkingRegion";
-    public static final String REGION_DETAIL_REDIS_KEY="parkingRegionDetail";
+    public static final String REGION_REDIS_KEY = "parkingRegion";
+    public static final String REGION_DETAIL_REDIS_KEY = "parkingRegionDetail";
     @Autowired
     private RedisTemplate redisTemplate;
+
     @Override
     public void saveToRedisAndMysql(ParkingRegion parkingRegion) {
-        if("".equals(parkingRegion.getParkingRegionName())){
+        if ("".equals(parkingRegion.getParkingRegionName())) {
             StringBuffer stringBuffer = new StringBuffer();
             stringBuffer.append(parkingRegion.getProvince()).append(parkingRegion.getCity())
                     .append(parkingRegion.getDistrict()).append(parkingRegion.getStreet())
                     .append(parkingRegion.getStreetNumber());
-            String str=stringBuffer.toString();
+            String str = stringBuffer.toString();
             parkingRegion.setParkingRegionName(str);
         }
-        if(parkingRegion.getParkingRegionCapacity()==null){
+        if (parkingRegion.getParkingRegionCapacity() == null) {
             parkingRegion.setParkingRegionCapacity(100);
         }
         this.save(parkingRegion);
-        log.info("存入mysql后regionId={}"+parkingRegion.getParkingRegionId());
+        log.info("存入mysql后regionId={}" + parkingRegion.getParkingRegionId());
         List<Double> centerLocation = parkingRegion.getCenterLocation();
-        if(parkingRegion.getParkingRegionId()!=null){
-            redisTemplate.opsForHash().put(REGION_DETAIL_REDIS_KEY,parkingRegion.getParkingRegionId().toString(),parkingRegion);
+        if (parkingRegion.getParkingRegionId() != null) {
+            redisTemplate.opsForHash().put(REGION_DETAIL_REDIS_KEY, parkingRegion.getParkingRegionId().toString(), parkingRegion);
             Long add = redisTemplate.opsForGeo().add(REGION_REDIS_KEY, new Point(centerLocation.get(0), centerLocation.get(1)),
                     parkingRegion.getParkingRegionId().toString());
-            log.info("存redisgeo之后的返参是+{}",add);
+            log.info("存redisgeo之后的返参是+{}", add);
         }
 
     }
 
     @Override
     public List<ParkingRegion> getRegionsByEnd(List<Double> lonAndLati) {
-        Double longitude=lonAndLati.get(0);
-        Double latitude=lonAndLati.get(1);
-        log.info("{}{}", longitude,latitude);
+        Double longitude = lonAndLati.get(0);
+        Double latitude = lonAndLati.get(1);
+        log.info("{}{}", longitude, latitude);
         RedisGeoCommands.GeoRadiusCommandArgs args =
                 RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeDistance().limit(10).sortAscending();
-        Distance radius = new Distance(0.5, Metrics.KILOMETERS);
-        Point point = new Point(longitude,latitude);
-        GeoResults<RedisGeoCommands.GeoLocation<String>> redis = redisTemplate.opsForGeo().radius(REGION_REDIS_KEY, new Circle(point,radius),args);
-        log.info("redis{}",redis);
+        Distance radius = new Distance(0.2, Metrics.KILOMETERS);
+        Point point = new Point(longitude, latitude);
+        GeoResults<RedisGeoCommands.GeoLocation<String>> redis = redisTemplate.opsForGeo().radius(REGION_REDIS_KEY, new Circle(point, radius), args);
+        log.info("redis{}", redis);
         List<GeoResult<RedisGeoCommands.GeoLocation<String>>> list = redis.getContent();
         List<ParkingRegion> pointIdList = new ArrayList<>();
-        if(CollectionUtils.isNotEmpty(list)){
-            for(GeoResult<RedisGeoCommands.GeoLocation<String>> geo : list){
+        if (CollectionUtils.isNotEmpty(list)) {
+            BigDecimal rate = new BigDecimal("1");
+            Integer useless=0;
+            for (GeoResult<RedisGeoCommands.GeoLocation<String>> geo : list) {
                 String pointId = geo.getContent().getName();
-                ParkingRegion parkingRegion = (ParkingRegion)redisTemplate.opsForHash().get(REGION_DETAIL_REDIS_KEY, pointId);
+                ParkingRegion parkingRegion = (ParkingRegion) redisTemplate.opsForHash().get(REGION_DETAIL_REDIS_KEY, pointId);
+                final BigDecimal usedCapacity = new BigDecimal(parkingRegion.getUsedCapacity());
+                final BigDecimal capacity = new BigDecimal((parkingRegion.getParkingRegionCapacity()));
+                BigDecimal tempRate = usedCapacity.divide(capacity);
+                if(tempRate.compareTo(rate)<0){
+                    rate=tempRate;
+                    useless=parkingRegion.getParkingRegionId();
+                }
                 pointIdList.add(parkingRegion);
             }
+            for (ParkingRegion parkingRegion : pointIdList) {
+                if(useless==parkingRegion.getParkingRegionId()){
+                    parkingRegion.setIsRecommend("Y");
+                }
+            }
+
         }
         return pointIdList;
     }

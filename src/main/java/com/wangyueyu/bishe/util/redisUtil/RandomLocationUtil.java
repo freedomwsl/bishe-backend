@@ -16,19 +16,20 @@ import java.util.Random;
 public class RandomLocationUtil {
     /**
      * 随机获取一个指定经纬度附近的一个坐标
-     *
-     * @param lngAndLat 指定坐标
+     * @param lngAndLat 指定经纬度
+     * @param length 东西跨度（单位千米近似）
+     * @param width 南北跨度
      * @return
      */
-    public static String randomLonLat(String lngAndLat) {
+    public static String randomLonLat(String lngAndLat,Double length,Double width) {
         String substring = lngAndLat.substring(0, lngAndLat.length() - 1);
         String[] split = substring.split(",");
         double lng1 = Double.parseDouble(split[0]);
         double lat1 = Double.parseDouble(split[1]);
-        double MinLon = lng1 - 0.1;
-        double MaxLon = lng1 + 0.1;
-        double MaxLat = lat1 + 0.05;
-        double MinLat = lat1 - 0.05;
+        double MinLon = lng1 - 0.01*length;
+        double MaxLon = lng1 + 0.01*length;
+        double MaxLat = lat1 + 0.005*width;
+        double MinLat = lat1 - 0.005*width;
         Random random = new Random();
         BigDecimal db = new BigDecimal(Math.random() * (MaxLon - MinLon) + MinLon);
         String lon = db.setScale(6, BigDecimal.ROUND_HALF_UP).toString();// 小数后6位

@@ -45,4 +45,8 @@ public class RedirectController {
     public String ceshi2(){
         return "/map/ceshi2";
     }
+    @GetMapping("/map/showBike")
+    public String showBike(){
+        return "/map/showBike";
+    }
 }

@@ -84,7 +84,7 @@
     <!-- <script type="text/javascript"
         src="http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.js"></script>
     <link rel="stylesheet" href="http://api.map.baidu.com/library/SearchInfoWindow/1.4/src/SearchInfoWindow_min.css" /> -->
-    <title>鼠标绘制选点工具</title>
+    <title>绘制停车区域</title>
 </head>
 
 <body>
@@ -213,7 +213,7 @@
             console.log(jsonMsg);
             path = jsonMsg;
             pathList = message;
-            console.log(typeof(pathList));
+            console.log(typeof (pathList));
             myGeo.getLocation(new BMapGL.Point(pathList[0].lng, pathList[0].lat), function (result) {
                 console.log(result);
                 if (result) {
@@ -246,21 +246,21 @@
             console.log("###############" + var8);
             console.log("var8.street" + var8.street);
             // 计算中间位置传给后端存redis
-            var longTotal=0;
-            var latiTotal=0;
-            for (var k = 0; k < pathList.length; k ++) {
+            var longTotal = 0;
+            var latiTotal = 0;
+            for (var k = 0; k < pathList.length; k++) {
                 console.log(pathList[k]);
-                var var4=pathList[k].lng;
-                var var5=pathList[k].lat;
-                longTotal+=var4;
-                latiTotal+=var5;
+                var var4 = pathList[k].lng;
+                var var5 = pathList[k].lat;
+                longTotal += var4;
+                latiTotal += var5;
             }
-            var longZhong=longTotal/pathList.length;
-            var latiZhong=latiTotal/pathList.length;
-            var centerLocation=[];
+            var longZhong = longTotal / pathList.length;
+            var latiZhong = latiTotal / pathList.length;
+            var centerLocation = [];
             centerLocation.push(longZhong);
             centerLocation.push(latiZhong);
-            console.log("centerLocation="+centerLocation);
+            console.log("centerLocation=" + centerLocation);
             parkingRegion = {
                 "parkingRegionCapacity": $("#parkingRegionCapacity").val(),
                 "parkingRegionName": $("#parkingRegionName").val(),

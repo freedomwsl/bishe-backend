@@ -3,6 +3,7 @@ package com.wangyueyu.bishe.controller.thymeleaf;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wangyueyu.bishe.entity.Bike;
+import com.wangyueyu.bishe.entity.ParkingRegion;
 import com.wangyueyu.bishe.service.BikeService;
 import com.wangyueyu.bishe.util.R;
 import com.wangyueyu.bishe.util.jasper.PageUtil;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
@@ -80,7 +82,9 @@ public class Bike1Controller {
         wrapper.isNotNull("long_lati");
         wrapper.eq("is_using","N");
         List<Bike> list = bikeService.list(wrapper);
-        Bike bike = list.get(0);
+        Random random = new Random();
+        int i = random.nextInt(list.size());
+        Bike bike = list.get(i);
         logger.info("getRandomBike");
         return R.success().data("bike",bike);
     }
@@ -89,6 +93,15 @@ public class Bike1Controller {
     public R addBike(@RequestBody Bike bike){
         bikeService.saveBike(bike);
         return R.success();
+    }
+    @ResponseBody
+    @GetMapping("/bike/showBike/{lng}/{lat}")
+    public R getBikes(@PathVariable Double lng,@PathVariable Double lat){
+        ArrayList<Double> doubles = new ArrayList<>();
+        doubles.add(lng);
+        doubles.add(lat);
+        List<Bike> bikes = bikeService.getBikesBylnglat(doubles);
+        return R.success().data("bikes", bikes);
     }
 
 }
