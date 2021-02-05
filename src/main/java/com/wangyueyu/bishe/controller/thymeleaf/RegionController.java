@@ -4,10 +4,12 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wangyueyu.bishe.entity.Bike;
 import com.wangyueyu.bishe.entity.ParkingRegion;
+import com.wangyueyu.bishe.entity.User;
 import com.wangyueyu.bishe.mapper.ParkingRegionMapper;
 import com.wangyueyu.bishe.service.ParkingRegionService;
 import com.wangyueyu.bishe.util.R;
 import com.wangyueyu.bishe.util.jasper.PageUtil;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.joda.time.ReadableInstant;
 import org.slf4j.Logger;
@@ -19,6 +21,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -74,11 +77,29 @@ public class RegionController {
 
     @ResponseBody
     @GetMapping("/map/getRegionsByEnd/{lon}/{lat}")
-    public R getRegionsByEnd(@PathVariable Double lon, @PathVariable Double lat) {
+    public R getRegionsByEnd(@PathVariable Double lon, @PathVariable Double lat, HttpSession session) {
+        final User user = (User)session.getAttribute("user");
+        Integer id=0;
+        if(user!=null){
+            id = user.getId();
+        }else{
+            return R.error().message("请先登录");
+        }
         ArrayList<Double> doubles = new ArrayList<>();
         doubles.add(lon);
         doubles.add(lat);
-        List<ParkingRegion> regions = regionService.getRegionsByEnd(doubles);
+        List<ParkingRegion> regions = regionService.getRegionsByEnd(doubles,id);
         return R.success().data("regions", regions);
+    }
+    @ResponseBody
+    @GetMapping("/map/stopBike/{lng}/{lat}")
+    public R stopBike(HttpSession session,@PathVariable Double lng,@PathVariable Double lat){
+        ArrayList<Double> doubles = new ArrayList<>();
+        doubles.add(lng);
+        doubles.add(lat);
+        final User user = (User)session.getAttribute("user");
+        final Integer id = user.getId();
+        String content=regionService.stopBike(doubles,id);
+        return R.success().message(content);
     }
 }
