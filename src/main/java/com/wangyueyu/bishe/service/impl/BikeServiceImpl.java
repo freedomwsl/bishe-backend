@@ -14,6 +14,7 @@ import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -32,6 +33,8 @@ public class BikeServiceImpl extends ServiceImpl<BikeMapper, Bike> implements Bi
     public static final String BIKE_REDIS_KEY="bike";
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private BikeMapper bikeMapper;
     @Override
     public void saveBike(Bike bike) {
         bike.setIsUsing("N");
@@ -66,5 +69,12 @@ public class BikeServiceImpl extends ServiceImpl<BikeMapper, Bike> implements Bi
             }
         }
         return bikeList;
+    }
+
+    @Override
+    public List<Bike> getBikesByTime() {
+        log.info("xxxxxxxxxxxxxx");
+        List<Bike> list=bikeMapper.getBikesByTime();
+        return list;
     }
 }

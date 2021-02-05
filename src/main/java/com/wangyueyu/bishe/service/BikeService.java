@@ -4,6 +4,7 @@ import com.wangyueyu.bishe.entity.Bike;
 import com.baomidou.mybatisplus.extension.service.IService;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -19,4 +20,6 @@ public interface BikeService extends IService<Bike> {
     void saveBike(Bike bike);
 
     List<Bike> getBikesBylnglat(ArrayList<Double> doubles);
+
+    List<Bike> getBikesByTime();
 }

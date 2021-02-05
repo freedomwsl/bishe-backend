@@ -15,10 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Random;
+import javax.servlet.http.HttpSession;
+import java.util.*;
 
 /**
  * description
@@ -102,6 +100,14 @@ public class Bike1Controller {
         doubles.add(lat);
         List<Bike> bikes = bikeService.getBikesBylnglat(doubles);
         return R.success().data("bikes", bikes);
+    }
+    @ResponseBody
+    @GetMapping("/bike/showUselessBike")
+    public R getUselessBike(HttpSession session){
+        final Object user = session.getAttribute("user");
+        System.out.println(user);
+        List<Bike> list = bikeService.getBikesByTime();
+        return R.success().data("bikes",list);
     }
 
 }

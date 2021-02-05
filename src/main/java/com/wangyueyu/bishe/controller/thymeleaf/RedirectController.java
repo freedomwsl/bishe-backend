@@ -49,4 +49,8 @@ public class RedirectController {
     public String showBike(){
         return "/map/showBike";
     }
+    @GetMapping("/map/showUnused")
+    public String showUnused(){
+        return "/map/showUnused";
+    }
 }

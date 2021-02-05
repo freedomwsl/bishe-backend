@@ -2,4 +2,7 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wangyueyu.bishe.mapper.BikeMapper">
 
+    <select id="getBikesByTime" resultType="com.wangyueyu.bishe.entity.Bike">
+        select * from bike where DATEDIFF(now(),gmt_modified) >2 and is_using="N";
+    </select>
 </mapper>

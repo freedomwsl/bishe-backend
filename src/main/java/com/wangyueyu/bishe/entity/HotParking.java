@@ -37,10 +37,10 @@ public class HotParking implements Serializable {
     private Integer parkingPlaceId;
 
     @ApiModelProperty(value = "热点开始时间")
-    private Date hotBeginTime;
+    private Integer hotBeginTime;
 
     @ApiModelProperty(value = "热点结束时间")
-    private Date hotFinalTime;
+    private Integer hotFinalTime;
 
     @ApiModelProperty(value = "热点原因")
     private String hotReason;

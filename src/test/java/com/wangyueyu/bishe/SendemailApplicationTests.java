@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.wangyueyu.bishe.entity.Bike;
 import com.wangyueyu.bishe.entity.ParkingRegion;
 import com.wangyueyu.bishe.entity.constant.GeoHashKey;
+import com.wangyueyu.bishe.mapper.BikeMapper;
 import com.wangyueyu.bishe.service.BikeService;
 import com.wangyueyu.bishe.service.IMailService;
 import com.wangyueyu.bishe.service.ParkingRegionService;
@@ -13,6 +14,7 @@ import com.wangyueyu.bishe.util.redisUtil.RandomLocationUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.geo.*;
@@ -42,6 +44,8 @@ public class SendemailApplicationTests {
     private ParkingRegionService regionService;
     @Autowired
     private BikeService bikeService;
+    @Autowired
+    private BikeMapper bikeMapper;
 
     /**
      * 测试发送文本邮件
@@ -81,6 +85,9 @@ public class SendemailApplicationTests {
         }
     }
 
+    /**
+     * 初始化单车数据
+     */
     @Test
     public void initialBike() {
         ArrayList<Bike> list = new ArrayList<>();
@@ -109,6 +116,19 @@ public class SendemailApplicationTests {
             redisTemplate.opsForHash().put(GeoHashKey.BIKE_DETAIL_REDIS_KEY, bike.getBikeId().toString(), bike);
             redisTemplate.opsForGeo().add(GeoHashKey.BIKE_REDIS_KEY, new Point(lng, lat), bike.getBikeId().toString());
         }
+    }
+    @Test
+    public void getBikes(){
+        Calendar rightNow = Calendar.getInstance(); // 子类对象
+        // 获取年
+        int year = rightNow.get(Calendar.YEAR);
+        // 获取月
+        int month = rightNow.get(Calendar.MONTH);
+        // 获取日
+        int date = rightNow.get(Calendar.DATE);
+        //获取几点
+        int hour=rightNow.get(Calendar.HOUR_OF_DAY);
+        System.out.println(year+","+month+","+date+","+hour);
     }
 }
 
