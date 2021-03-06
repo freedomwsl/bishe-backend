@@ -66,4 +66,12 @@ public class RedirectController {
     public String testdiv(){
         return "/map/testdiv";
     }
+    @GetMapping("/map/hotImageTest")
+    public String hotImageTest(){
+        return "/map/hotImageTest";
+    }
+    @GetMapping("/map/testArea")
+    public String testArea(){
+        return "/map/testArea";
+    }
 }

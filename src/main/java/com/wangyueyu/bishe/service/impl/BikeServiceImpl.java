@@ -55,7 +55,7 @@ public class BikeServiceImpl extends ServiceImpl<BikeMapper, Bike> implements Bi
         log.info("{}{}", longitude, latitude);
         RedisGeoCommands.GeoRadiusCommandArgs args =
                 RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeDistance().sortAscending();
-        Distance radius = new Distance(1, Metrics.KILOMETERS);
+        Distance radius = new Distance(0.2, Metrics.KILOMETERS);
         Point point = new Point(longitude, latitude);
         GeoResults<RedisGeoCommands.GeoLocation<String>> redis = redisTemplate.opsForGeo().radius(GeoHashKey.BIKE_REDIS_KEY, new Circle(point, radius), args);
         log.info("redis{}", redis);
