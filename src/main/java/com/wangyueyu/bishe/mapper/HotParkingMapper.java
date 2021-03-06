@@ -18,5 +18,5 @@ import java.util.List;
 @Mapper
 public interface HotParkingMapper extends BaseMapper<HotParking> {
 
-    List<HotParkingVO> getHotParkingJoinPlace(int hour);
+    List<HotParkingVO> getHotParkingJoinPlace(String hour);
 }

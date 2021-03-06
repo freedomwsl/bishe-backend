@@ -62,4 +62,8 @@ public class RedirectController {
     public String toAddBike(){
         return "/oa/addBike";
     }
+    @GetMapping("/map/testdiv")
+    public String testdiv(){
+        return "/map/testdiv";
+    }
 }

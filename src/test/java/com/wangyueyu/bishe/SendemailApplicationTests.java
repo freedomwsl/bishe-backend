@@ -150,9 +150,8 @@ public class SendemailApplicationTests {
     @Test
     public void testxxxs(){
         final HashMap<String, List> map = new HashMap<>();
-        final Calendar instance = Calendar.getInstance();
-        Integer hour=(Integer)instance.get(Calendar.HOUR_OF_DAY);
-        List<HotParkingVO> list = hotParkingService.getHotParkingJoinPlace(12);
+        final String time = RandomLocationUtil.getTime();
+        List<HotParkingVO> list = hotParkingService.getHotParkingJoinPlace(time);
         map.put("hotParkingList",list);
         System.out.println(list);
     }

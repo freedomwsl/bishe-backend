@@ -22,12 +22,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.Point;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.ArrayList;
@@ -51,7 +55,7 @@ public class RegionController {
     @GetMapping("/user/regionManage_{pageCurrent}_{pageSize}_{pageCount}")
     public String itemManage(@PathVariable Integer pageCurrent, @PathVariable Integer pageSize,
                              @PathVariable Integer pageCount, Model model) {
-        if (pageSize == 0) pageSize = 50;
+        if (pageSize == 0) pageSize = 20;
         if (pageCurrent == 0) pageCurrent = 1;
         //创建page对象
         Page<ParkingRegion> page = new Page<>(pageCurrent, pageSize);
@@ -148,9 +152,8 @@ public class RegionController {
     @GetMapping("/showHotParking")
     public R showHotParking(){
         final HashMap<String, Object> map = new HashMap<>();
-        final Calendar instance = Calendar.getInstance();
-        Integer hour=(Integer)instance.get(Calendar.HOUR_OF_DAY);
-        List<HotParkingVO> list = hotParkingService.getHotParkingJoinPlace(hour);
+        final String time = RandomLocationUtil.getTime();
+        List<HotParkingVO> list = hotParkingService.getHotParkingJoinPlace(time);
         map.put("hotParkingList",list);
         List<ParkingRegion> regionList=new ArrayList<>();
         for (HotParkingVO hotParkingVO : list) {
@@ -166,6 +169,20 @@ public class RegionController {
     public String addRegionsByExcel(MultipartFile file) throws IOException, InvalidFormatException {
         Boolean b= regionService.saveRegionsByExcel(file);
         return "redirect:/user/regionManage_0_0_0";
+    }
+    @RequestMapping("/user/download/{filename}")
+    public ResponseEntity<byte[]> download(@PathVariable String filename, HttpSession session) throws IOException {
+        ServletContext servletContext = session.getServletContext();
+        File file=new File("F:\\工作簿1.xlsx");
+        //读文件
+        FileInputStream fileInputStream = new FileInputStream(file);
+        byte[] bytes=new byte[fileInputStream.available()];
+        fileInputStream.read(bytes) ;
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.add("Content-Disposition","attachment;filename"+filename);
+        ResponseEntity<byte[]> responseEntity = new ResponseEntity<>(bytes, httpHeaders, HttpStatus.OK);
+
+        return responseEntity ;
     }
 
 

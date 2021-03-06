@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
@@ -96,5 +97,12 @@ public class RandomLocationUtil {
         doubles.add(lng);
         doubles.add(lat);
         return doubles;
+    }
+    public static String getTime(){
+        final Calendar instance = Calendar.getInstance();
+        final int hour = instance.get(Calendar.HOUR_OF_DAY)-1;
+        final int minute = instance.get(Calendar.MINUTE);
+        final int second = instance.get(Calendar.SECOND);
+        return hour+":"+minute+":"+second;
     }
 }

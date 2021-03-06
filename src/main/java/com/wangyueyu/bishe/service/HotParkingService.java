@@ -17,5 +17,5 @@ import java.util.List;
  */
 public interface HotParkingService extends IService<HotParking> {
 
-    List<HotParkingVO> getHotParkingJoinPlace(Integer hour);
+    List<HotParkingVO> getHotParkingJoinPlace(String hour);
 }

@@ -5,6 +5,7 @@ import com.wangyueyu.bishe.entity.*;
 import com.wangyueyu.bishe.entity.constant.GeoHashKey;
 import com.wangyueyu.bishe.entity.vo.HotParkingVO;
 import com.wangyueyu.bishe.service.*;
+import com.wangyueyu.bishe.util.redisUtil.RandomLocationUtil;
 import io.swagger.models.auth.In;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -69,9 +70,9 @@ public class SaticScheduleTask {
     private void hotParking(){
         List<User> userList = userService.list(null);
         final HashMap<String, List> map = new HashMap<>();
-        final Calendar instance = Calendar.getInstance();
-        int hour=instance.get(Calendar.HOUR_OF_DAY);
-        List<HotParkingVO> list = hotParkingService.getHotParkingJoinPlace(hour);
+
+        String time = RandomLocationUtil.getTime();
+        List<HotParkingVO> list = hotParkingService.getHotParkingJoinPlace(time);
         map.put("hotParkingList",list);
         final StringBuilder emailContent = new StringBuilder();
         emailContent.append("你好，接下来一小时有这些热点停车点需要单车，请合理搬运单车");
