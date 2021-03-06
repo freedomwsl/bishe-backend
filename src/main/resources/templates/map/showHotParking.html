@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+
+    <title>Hello, World</title>
+    <style type="text/css">
+        html{height:100%}
+        body{height:100%;margin:0px;padding:0px}
+        #container{height:100%}
+    </style>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script type="text/javascript" src="http://api.map.baidu.com/api?v=3.0&ak=IsP2hS57WxEhq9wGXOPRxpmqctE6RKTY"></script>
+    <script type="text/javascript" src="https://api.map.baidu.com/api?v=1.0&type=webgl&ak=IsP2hS57WxEhq9wGXOPRxpmqctE6RKTY">
+    </script>
+</head>
+
+<body>
+<div id="container"></div>
+<script type="text/javascript">
+    var map = new BMap.Map("container");
+    // 创建地图实例
+    var point = new BMap.Point(113.557471,34.836515);
+    // 创建点坐标
+    map.centerAndZoom(point, 16);
+    map.enableScrollWheelZoom(true);     //开启鼠标滚轮缩放
+    map.enableContinuousZoom(true);    //启用地图惯性拖拽，默认禁用
+    map.addControl(new BMap.NavigationControl());  //添加默认缩放平移控件
+    map.addControl(new BMap.ScaleControl({anchor: BMAP_ANCHOR_BOTTOM_LEFT})); //向地图中添加比例尺控件
+    // 初始化地图，设置中心点坐标和地图级别
+    $.ajax({
+        type: "GET",
+        url: "/showHotParking",
+        dataType: "json",
+        success: function (respMsg) {
+            // 划停车区域
+            for (var k = 0; k < respMsg.data.regionList.length; k++) {
+                drawRegions(respMsg.data.regionList[k]);
+            }
+            // 画热点停车点
+
+            for (var k = 0; k < respMsg.data.hotParkingList.length; k ++) {
+                var var11 = respMsg.data.hotParkingList[k];
+                console.log(var11);
+                var var1 = var11.parkingPlaceLongLati;
+                var var2 = var1.split(",");
+                var var3 = var2[0];
+                var var4 = var2[1];
+                var var5 = [];
+                var5.push(new BMap.Point(parseFloat(var3),parseFloat(var4)));
+                console.log(var5);
+                // var marker2 = new BMap.Marker(var5[0]);  // 创建标注
+                var myIcon = new BMap.Icon("/img/bike/热点.png", new BMapGL.Size(16, 16));
+                marker2 = new BMap.Marker(var5[0], {
+                    icon: myIcon
+                });
+                map.addOverlay(marker2);
+                var opts = {
+                    width : 200,     // 信息窗口宽度
+                    height: 150,     // 信息窗口高度
+                    title : var11.parkingPlaceName , // 信息窗口标题
+                }
+                var var6="热点停车点id："+var11.hotParkingId+"</br>停车地点名称"+var11.parkingPlaceName+
+                        "</br>坐标："+var11.parkingPlaceLongLati+"</br>热点类型："+var11.parkingPlaceType+
+                        "</br>热点原因: "+var11.hotReason;
+                var infoWindow = new BMap.InfoWindow(var6, opts);  // 创建信息窗口对象
+                marker2.addEventListener("click", function(){
+                    this.openInfoWindow(infoWindow, point); //开启信息窗口
+                });
+
+            }
+        }
+    });
+    function drawRegions(e) {
+        var var1 = e;
+        var var2 = JSON.parse(var1.parkingRegionLongLati);
+        // 构成多边形的点的数组
+        var pointArr = [];
+        var longTotal = 0;
+        var latiTotal = 0;
+        for (var k = 0; k < var2.length; k++) {
+            var var4 = var2[k].lng;
+            var var5 = var2[k].lat;
+            longTotal += var4;
+            latiTotal += var5;
+            pointArr.push({
+                lng: var4,
+                lat: var5
+            });
+        }
+        var longZhong = longTotal / var2.length;
+        var latiZhong = latiTotal / var2.length;
+        pointArr.push({
+            lng: var2[0].lng,
+            lat: var2[0].lat
+        })
+        // 生成坐标点
+        var trackPoint = [];
+        for (var i = 0, j = pointArr.length; i < j; i++) {
+            trackPoint.push(new BMap.Point(pointArr[i].lng, pointArr[i].lat));
+        }
+        var trackPoint2 = [];
+        trackPoint2.push(new BMap.Point(longZhong, latiZhong));
+        var marker2;
+        console.log("isrecommen" + e.isRecommend);
+        if (e.isRecommend == "Y") {
+            console.log("进来了---------------------------------");
+            var myIcon = new BMap.Icon("/img/bike/红包.png", new BMapGL.Size(50, 50));
+            marker2 = new BMap.Marker(trackPoint2[0], {
+                icon: myIcon
+            });
+            console.log("xxx");
+            map.addOverlay(marker2);
+        } else {
+            var marker2 = new BMap.Marker(trackPoint2[0]);  // 创建标注
+            map.addOverlay(marker2);
+        }
+
+        var sContent =
+            "<h4 style='margin:0 0 5px 0;padding:0.2em 0'>" + var1.parkingRegionId + "</h4>" +
+            "<label>停车区域名称：</label><p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>" + var1.parkingRegionName + "</p>" +
+            "<label>停车区域容量：</label><p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>" + var1.parkingRegionCapacity + "</p>" +
+            "<label>停车区域已使用容量：</label><p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>" + var1.usedCapacity + "</p>" +
+            "</div>";
+        var infoWindow = new BMap.InfoWindow(sContent);
+        marker2.addEventListener('mouseover', function () {
+            this.openInfoWindow(infoWindow);
+        });
+
+        // 画线
+        var polyline = new BMap.Polyline(trackPoint, {
+            strokeColor: "#ad0e21",
+            strokeWeight: 3,
+            setStrokeStyle: "dashed",
+            strokeOpacity: 1
+        });
+        map.addOverlay(polyline);
+        // 配置图片
+        var size = new BMap.Size(22, 22);
+        var offset = new BMap.Size(0, 0);
+        var imageSize = new BMap.Size(20, 20);
+
+        // 画图标
+        // for (var i = 0, j = trackPoint.length; i < j; i++) {
+        //     var marker = new BMap.Marker(trackPoint[i], {
+        //         offset: offset
+        //     }); // 创建标注
+        //     map.addOverlay(marker);
+        //     marker.addEventListener("click",function () {
+        //         // alert(this.getPosition())
+        //         var point=this.getPosition();
+        //         alert("经度："+point.lng+"\n"+"纬度："+point.lat)
+        //     })
+        // }
+    };
+</script>
+</body>
+</html>

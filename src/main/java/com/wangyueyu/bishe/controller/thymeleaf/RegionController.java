@@ -5,12 +5,18 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wangyueyu.bishe.entity.Bike;
 import com.wangyueyu.bishe.entity.ParkingRegion;
 import com.wangyueyu.bishe.entity.User;
+import com.wangyueyu.bishe.entity.vo.HotParkingVO;
 import com.wangyueyu.bishe.mapper.ParkingRegionMapper;
+import com.wangyueyu.bishe.service.HotParkingService;
 import com.wangyueyu.bishe.service.ParkingRegionService;
 import com.wangyueyu.bishe.util.R;
 import com.wangyueyu.bishe.util.jasper.PageUtil;
+import com.wangyueyu.bishe.util.redisUtil.RandomLocationUtil;
 import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.ss.usermodel.WorkbookFactory;
 import org.joda.time.ReadableInstant;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +25,14 @@ import org.springframework.data.geo.Point;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
+import java.io.*;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -34,11 +44,11 @@ import java.util.List;
 public class RegionController {
     @Autowired
     private ParkingRegionService regionService;
-    @Resource
-    private ParkingRegionMapper parkingRegionMapper;
+    @Autowired
+    private HotParkingService hotParkingService;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    @RequestMapping("/user/regionManage_{pageCurrent}_{pageSize}_{pageCount}")
+    @GetMapping("/user/regionManage_{pageCurrent}_{pageSize}_{pageCount}")
     public String itemManage(@PathVariable Integer pageCurrent, @PathVariable Integer pageSize,
                              @PathVariable Integer pageCount, Model model) {
         if (pageSize == 0) pageSize = 50;
@@ -58,6 +68,12 @@ public class RegionController {
         return "oa/regionManage";
     }
 
+    /**
+     * 根据id获取停车区域信息传给前端展示在地图
+     * @param id
+     * @param model
+     * @return
+     */
     @GetMapping("/user/displayWithMap")
     public String displayWithMap(Integer id, Model model) {
         QueryWrapper<ParkingRegion> wrapper = new QueryWrapper<>();
@@ -67,14 +83,26 @@ public class RegionController {
         return "oa/displayWithLongLati";
     }
 
+    /**
+     * 添加停车区域
+     * @param parkingRegion
+     * @return
+     */
     @ResponseBody
-    @PostMapping("/map/addRegion")
+    @PostMapping("/user/addRegion")
     public R addRegion(@RequestBody ParkingRegion parkingRegion) {
         logger.info("{}", parkingRegion);
         regionService.saveToRedisAndMysql(parkingRegion);
         return R.success().message("添加成功");
     }
 
+    /**
+     * 根据终点获取周围的停车区域
+     * @param lon
+     * @param lat
+     * @param session
+     * @return
+     */
     @ResponseBody
     @GetMapping("/map/getRegionsByEnd/{lon}/{lat}")
     public R getRegionsByEnd(@PathVariable Double lon, @PathVariable Double lat, HttpSession session) {
@@ -91,6 +119,14 @@ public class RegionController {
         List<ParkingRegion> regions = regionService.getRegionsByEnd(doubles,id);
         return R.success().data("regions", regions);
     }
+
+    /**
+     * 模拟停车
+     * @param session
+     * @param lng
+     * @param lat
+     * @return
+     */
     @ResponseBody
     @GetMapping("/map/stopBike/{lng}/{lat}")
     public R stopBike(HttpSession session,@PathVariable Double lng,@PathVariable Double lat){
@@ -102,4 +138,35 @@ public class RegionController {
         String content=regionService.stopBike(doubles,id);
         return R.success().message(content);
     }
+
+    /**
+     * 需要热点停车点的数据，停车区域数据
+     * @param session
+     * @return
+     */
+    @ResponseBody
+    @GetMapping("/showHotParking")
+    public R showHotParking(){
+        final HashMap<String, Object> map = new HashMap<>();
+        final Calendar instance = Calendar.getInstance();
+        Integer hour=(Integer)instance.get(Calendar.HOUR_OF_DAY);
+        List<HotParkingVO> list = hotParkingService.getHotParkingJoinPlace(hour);
+        map.put("hotParkingList",list);
+        List<ParkingRegion> regionList=new ArrayList<>();
+        for (HotParkingVO hotParkingVO : list) {
+            final String parkingPlaceLongLati = hotParkingVO.getParkingPlaceLongLati();
+            final List<Double> doubles = RandomLocationUtil.stringToDoubleList(parkingPlaceLongLati);
+            List<ParkingRegion> regions = regionService.getRegionsByHotParkingPlace(doubles);
+            regionList.addAll(regions);
+        }
+        map.put("regionList",regionList);
+        return R.success().data(map);
+    }
+    @PostMapping("/addRegions")
+    public String addRegionsByExcel(MultipartFile file) throws IOException, InvalidFormatException {
+        Boolean b= regionService.saveRegionsByExcel(file);
+        return "redirect:/user/regionManage_0_0_0";
+    }
+
+
 }

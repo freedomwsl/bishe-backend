@@ -2,4 +2,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.wangyueyu.bishe.mapper.HotParkingMapper">
 
+    <select id="getHotParkingJoinPlace" resultType="com.wangyueyu.bishe.entity.vo.HotParkingVO">
+        SELECT
+        pp.parking_place_id,
+        pp.parking_place_name,
+        pp.parking_place_long_lati,
+        pp.parking_place_type,
+        hp.hot_parking_id,
+        hp.hot_begin_time,
+        hp.hot_final_time,
+        hp.hot_reason
+        FROM
+        hot_parking hp
+        JOIN parking_place pp ON hp.parking_place_id = pp.parking_place_id
+        WHERE
+        hot_final_time>#{hour} and  hot_begin_time <![CDATA[ <= ]]> #{hour}
+    </select>
 </mapper>

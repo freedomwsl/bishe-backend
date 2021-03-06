@@ -24,17 +24,14 @@ public class RedirectController {
     }
     @GetMapping("/map/changchunmap")
     public String changchun(Model model) {
-        logger.info("#############");
         return "/map/changchunmap";
     }
     @GetMapping("/map/huatu")
     public String huatu(Model model) {
-        logger.info("#############");
         return "/map/根据一串坐标绘制";
     }
     @GetMapping("/user/addRegion")
     public String addRegion(Model model) {
-        logger.info("#############");
         return "/map/huiZhi";
     }
     @GetMapping("/map/ceshi")
@@ -52,5 +49,17 @@ public class RedirectController {
     @GetMapping("/map/showUnused")
     public String showUnused(){
         return "/map/showUnused";
+    }
+    @GetMapping("/map/showHotParking")
+    public String showHotParking(){
+        return "/map/showHotParking";
+    }
+    @GetMapping("/testLayui")
+    public String testLayui(){
+        return "/oa/testLayui";
+    }
+    @GetMapping("/user/addBike")
+    public String toAddBike(){
+        return "/oa/addBike";
     }
 }

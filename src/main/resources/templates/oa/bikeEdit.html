@@ -129,7 +129,7 @@
                                 <div class="hr-line-dashed"></div>
                                 <div class="form-group">
                                     <div class="col-sm-4 col-sm-offset-2">
-                                        <button id="submitButton" class="btn btn-primary" type="button">&nbsp;&nbsp;&nbsp;&nbsp;提&nbsp;&nbsp;&nbsp;&nbsp;交&nbsp;&nbsp;&nbsp;&nbsp;</button>
+                                        <button id="submitButton" class="btn btn-primary" type="submit">&nbsp;&nbsp;&nbsp;&nbsp;提&nbsp;&nbsp;&nbsp;&nbsp;交&nbsp;&nbsp;&nbsp;&nbsp;</button>
                                     </div>
                                 </div>
                             </form>
@@ -166,22 +166,7 @@
 <script th:src="@{/js/plugins/summernote/summernote.min.js}"></script>
 
 
-<script th:inline="javascript">
-    var image = [[${item.image}]];
-    $(document).ready(function () {
-        if(image==null || image==""){
-            $("#imageCell").hide();
-            $("#imputCell").show();
-        } else {
-            $("#imageCell").show();
-            $("#imputCell").hide();
-        }
-        $("#imageCellBut").click(function(){
-            $("#imageCell").hide();
-            $("#imputCell").show();
-        });
-    });
-</script>
+
 <script th:inline="javascript">
     $(document).ready(function () {
         //初始化编辑器

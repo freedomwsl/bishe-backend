@@ -2,9 +2,13 @@ package com.wangyueyu.bishe.controller.thymeleaf;
 
 
 
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.wangyueyu.bishe.entity.UcenterMember;
 import com.wangyueyu.bishe.entity.utilEntity.Stats;
 import com.wangyueyu.bishe.redis.DashboardKey;
 import com.wangyueyu.bishe.redis.RedisService;
+import com.wangyueyu.bishe.service.UcenterMemberService;
+import com.wangyueyu.bishe.service.impl.UcenterMemberServiceImpl;
 import com.wangyueyu.bishe.util.jasper.RunnableThreadWebCount;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -37,6 +41,8 @@ public class DashboardController {
 
     @Autowired
     private RedisService redisService;
+    @Autowired
+    private UcenterMemberService ucenterMemberService;
 
     @GetMapping("/user/dashboard")
     public String dashboard(Model model, Stats stats) {
@@ -151,4 +157,14 @@ public class DashboardController {
     public int count(@RequestParam("key") String key) {
         return RunnableThreadWebCount.addCount(key);
     }
+
+    @GetMapping("/xxx")
+    public List<UcenterMember> getUser(){
+        final QueryWrapper<UcenterMember> wrapper = new QueryWrapper<>();
+        wrapper.orderByAsc("recommend_times");
+
+        final List<UcenterMember> list = ucenterMemberService.list(wrapper);
+        return list;
+    }
+
 }

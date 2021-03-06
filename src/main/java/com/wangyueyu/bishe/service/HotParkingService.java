@@ -2,6 +2,10 @@ package com.wangyueyu.bishe.service;
 
 import com.wangyueyu.bishe.entity.HotParking;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.wangyueyu.bishe.entity.vo.HotParkingVO;
+import io.swagger.models.auth.In;
+
+import java.util.List;
 
 /**
  * <p>
@@ -13,4 +17,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
  */
 public interface HotParkingService extends IService<HotParking> {
 
+    List<HotParkingVO> getHotParkingJoinPlace(Integer hour);
 }

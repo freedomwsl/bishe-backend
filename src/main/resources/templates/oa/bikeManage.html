@@ -21,16 +21,16 @@
         <div class="border-bottom" th:include="header :: headerTop"></div>
         <div class="row wrapper border-bottom white-bg page-heading" th:fragment="headerNav">
             <div class="col-lg-10">
-                <h2>商品管理</h2>
+                <h2>单车管理</h2>
                 <ol class="breadcrumb">
                     <li>
                         <a href="#">首页</a>
                     </li>
                     <li>
-                        <a>商品管理</a>
+                        <a>单车管理</a>
                     </li>
                     <li class="active">
-                        <strong>商品管理</strong>
+                        <strong>单车管理</strong>
                     </li>
                 </ol>
             </div>
@@ -65,7 +65,7 @@
                 <div class="col-lg-12">
                     <div class="ibox float-e-margins">
                         <div class="ibox-title">
-                            <h5>商品列表</h5>
+                            <h5>单车列表</h5>
                             <div class="ibox-tools">
                                 <a class="collapse-link">
                                     <i class="fa fa-chevron-up"></i>
@@ -97,9 +97,9 @@
 
                                      
                                         <td>
-                                            <a th:href="@{'bikeEdit?id='+${bike.bikeId}}" title="修改"><i class="fa fa-edit text-navy"></i></a>
+<!--                                            <a th:href="@{'bikeEdit?id='+${bike.bikeId}}" title="修改"><i class="fa fa-edit text-navy"></i></a>-->
                                             &nbsp;&nbsp;&nbsp;&nbsp;
-                                            <a href="#" th:onclick="'javascript:updateState('+${bike.bikeId}+',2,0);'" title="删除"><i class="fa fa-trash-o text-navy"></i></a>
+                                            <a href="#" th:onclick="'javascript:updateState('+${bike.bikeId}+',2,0);'" title="报废"><i class="fa fa-trash-o text-navy"></i></a>
                                         </td>
                                     </tr>
                                     </tbody>

@@ -12,6 +12,7 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
+import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * <p>
@@ -37,10 +38,12 @@ public class HotParking implements Serializable {
     private Integer parkingPlaceId;
 
     @ApiModelProperty(value = "热点开始时间")
-    private Integer hotBeginTime;
+    @DateTimeFormat(pattern = "HH:mm")
+    private String hotBeginTime;
 
     @ApiModelProperty(value = "热点结束时间")
-    private Integer hotFinalTime;
+    @DateTimeFormat(pattern = "HH:mm")
+    private String hotFinalTime;
 
     @ApiModelProperty(value = "热点原因")
     private String hotReason;

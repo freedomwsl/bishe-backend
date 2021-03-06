@@ -2,16 +2,19 @@ package com.wangyueyu.bishe;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.wangyueyu.bishe.entity.Bike;
 import com.wangyueyu.bishe.entity.ParkingRegion;
+import com.wangyueyu.bishe.entity.ParkingRegionJobRecord;
 import com.wangyueyu.bishe.entity.constant.GeoHashKey;
+import com.wangyueyu.bishe.entity.vo.HotParkingVO;
 import com.wangyueyu.bishe.mapper.BikeMapper;
-import com.wangyueyu.bishe.service.BikeService;
-import com.wangyueyu.bishe.service.IMailService;
-import com.wangyueyu.bishe.service.ParkingRegionService;
+import com.wangyueyu.bishe.service.*;
 import com.wangyueyu.bishe.util.redisUtil.RandomLocationUtil;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.poi.ss.usermodel.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mybatis.spring.annotation.MapperScan;
@@ -22,7 +25,10 @@ import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.File;
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 
@@ -45,7 +51,9 @@ public class SendemailApplicationTests {
     @Autowired
     private BikeService bikeService;
     @Autowired
-    private BikeMapper bikeMapper;
+    private ParkingRegionJobRecordService parkingRegionJobRecordService;
+    @Autowired
+    private HotParkingService hotParkingService;
 
     /**
      * 测试发送文本邮件
@@ -111,24 +119,86 @@ public class SendemailApplicationTests {
             String longLati = bike.getLongLati();
 
             String[] split = longLati.split(",");
-            Double lng=Double.parseDouble(split[0]);
-            Double lat = Double.parseDouble(split[1]);
+            double lng= Double.parseDouble(split[0]);
+            double lat = Double.parseDouble(split[1]);
             redisTemplate.opsForHash().put(GeoHashKey.BIKE_DETAIL_REDIS_KEY, bike.getBikeId().toString(), bike);
             redisTemplate.opsForGeo().add(GeoHashKey.BIKE_REDIS_KEY, new Point(lng, lat), bike.getBikeId().toString());
         }
     }
+
+    /**
+     * 测试定时记录停车区域job
+     */
     @Test
     public void getBikes(){
-        Calendar rightNow = Calendar.getInstance(); // 子类对象
-        // 获取年
-        int year = rightNow.get(Calendar.YEAR);
-        // 获取月
-        int month = rightNow.get(Calendar.MONTH);
-        // 获取日
-        int date = rightNow.get(Calendar.DATE);
-        //获取几点
-        int hour=rightNow.get(Calendar.HOUR_OF_DAY);
-        System.out.println(year+","+month+","+date+","+hour);
+        final ArrayList<ParkingRegionJobRecord> list = new ArrayList<>();
+        final Map<String,ParkingRegion> entries = redisTemplate.opsForHash().entries(GeoHashKey.REGION_DETAIL_REDIS_KEY);
+        for (String integer : entries.keySet()) {
+            final ParkingRegion parkingRegion = entries.get(integer);
+            final BigDecimal usedCapacity = new BigDecimal(parkingRegion.getUsedCapacity());
+            final BigDecimal capacity = new BigDecimal(parkingRegion.getParkingRegionCapacity());
+            final BigDecimal useRate = usedCapacity.divide(capacity,2,RoundingMode.HALF_UP);
+
+            final ParkingRegionJobRecord parkingRegionJobRecord = new ParkingRegionJobRecord();
+            parkingRegionJobRecord.setUseRate(useRate);
+            parkingRegionJobRecord.setRecordDate(new Date());
+            parkingRegionJobRecord.setParkingRegionId(parkingRegion.getParkingRegionId());
+            list.add(parkingRegionJobRecord);
+        }
+        parkingRegionJobRecordService.saveBatch(list);
+    }
+    @Test
+    public void testxxxs(){
+        final HashMap<String, List> map = new HashMap<>();
+        final Calendar instance = Calendar.getInstance();
+        Integer hour=(Integer)instance.get(Calendar.HOUR_OF_DAY);
+        List<HotParkingVO> list = hotParkingService.getHotParkingJoinPlace(12);
+        map.put("hotParkingList",list);
+        System.out.println(list);
+    }
+    @Test
+    public void testOptional(){
+        final boolean equals = new BigDecimal("0.0").equals(new BigDecimal("0.00"));
+        System.out.println(equals);
+    }
+    @Test
+    public void testExcel() throws IOException, InvalidFormatException {
+        Workbook workbook = WorkbookFactory.create(new File("F:\\工作簿1.xlsx"));
+        System.out.println("sheets" + workbook.getNumberOfSheets());
+        //获取一张表
+        Sheet sheet = workbook.getSheetAt(0);
+        System.out.println(sheet.getLastRowNum());
+        for (int i=1;i<=sheet.getLastRowNum()-1;i++) {//跳过第一行
+            Row row=sheet.getRow(i);//取得第i行数据
+            System.out.println("----------"+row.getLastCellNum());
+            String [] str=new String[row.getLastCellNum()];
+            for (int j=0;j<row.getLastCellNum();j++) {
+                Cell cell=row.getCell(j);//取得第j列数据
+                cell.setCellType(CellType.STRING);
+                str[j]=cell.getStringCellValue().trim();
+                System.out.print(str[j]+" ");
+            }
+            final ParkingRegion parkingRegion = new ParkingRegion();
+            parkingRegion.setParkingRegionName(str[0]);
+            System.out.println(str[0]);
+            System.out.println(str[1]);
+            parkingRegion.setParkingRegionCapacity(Integer.parseInt(str[1]));
+            System.out.println(str[1]);
+            parkingRegion.setParkingRegionLongLati(str[2]);
+            System.out.println(str[2]);
+            parkingRegion.setProvince(str[3]);
+            System.out.println(str[3]);
+            parkingRegion.setCity(str[4]);
+            System.out.println(str[4]);
+            parkingRegion.setStreet(str[5]);
+            System.out.println(str[5]);
+            parkingRegion.setCenterLocation(RandomLocationUtil.getCenter(str[2]));
+            System.out.println(str[6]);
+            parkingRegion.setUsedCapacity(0);
+            System.out.println(parkingRegion);
+        }
+
+
     }
 }
 

@@ -56,9 +56,9 @@
     var marker2 = new BMap.Marker(trackPoint2[0]);  // 创建标注
     map.addOverlay(marker2);
     var sContent =
-        "<h4 style='margin:0 0 5px 0;padding:0.2em 0'>"+var1.parkingRegionId+"</h4>" +
-        "<img style='float:right;margin:4px' id='imgDemo' th:src='/img/bike/共享单车.png' width='139' height='104' title='"+var1.parkingRegionCapacity+"'/>" +
-        "<p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>"+var1.parkingRegionName+"</p>" +
+        "<label>id:</label>"+var1.parkingRegionId +
+        "<br><label>容量:</label>"+var1.parkingRegionCapacity +
+        "<br><label>区域名称:</label>"+var1.parkingRegionName+"</p>" +
         "</div>";
     var infoWindow = new BMap.InfoWindow(sContent);
     marker2.addEventListener('mouseover', function(){

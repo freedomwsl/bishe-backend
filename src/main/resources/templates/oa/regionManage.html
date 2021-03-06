@@ -21,16 +21,16 @@
         <div class="border-bottom" th:include="header :: headerTop"></div>
         <div class="row wrapper border-bottom white-bg page-heading" th:fragment="headerNav">
             <div class="col-lg-10">
-                <h2>商品管理</h2>
+                <h2>停车区域管理</h2>
                 <ol class="breadcrumb">
                     <li>
                         <a href="#">首页</a>
                     </li>
                     <li>
-                        <a>商品管理</a>
+                        <a>停车区域管理</a>
                     </li>
                     <li class="active">
-                        <strong>商品管理</strong>
+                        <strong>停车区域管理</strong>
                     </li>
                 </ol>
             </div>
@@ -51,39 +51,17 @@
                             </div>
                         </div>
                         <div class="ibox-content" style="display: block;">
-<!--                            <form action="bikeManage_0_0_0">-->
-<!--                                <div class="row">-->
-<!--                                    <div class="col-sm-2 m-b-xs">-->
-<!--                                        <input id="title" name="title" placeholder="商品标题" class="form-control" type="text" th:value="${item.title}"/>-->
-<!--                                    </div>-->
-<!--                                    <div class="col-sm-2 m-b-xs">-->
-<!--                                       <select name="cid" id="cid" class="form-control" >-->
-<!--                                            <option value="0" th:selected="${item.cid==0}">&#45;&#45;请选择商品分类&#45;&#45;</option>-->
-<!--                                            <option th:each="ic : ${itemCategoryList}" th:value="${ic.id}" th:text="${ic.name}" th:selected="${ic.id==item.cid}">分类</option>-->
-<!--                                        </select>-->
-<!--                                    </div>-->
-
-<!--                                    <div class="col-sm-2 m-b-xs">-->
-<!--                                        <input id="minPrice" name="minPrice" class="form-control" type="text" th:value="${item.minPrice}" placeholder="最低价格" />-->
-<!--                                    </div>-->
-<!--                                    <div class="col-sm-2 m-b-xs">-->
-<!--                                        <input id="maxPrice" name="maxPrice"  class="form-control" type="text" th:value="${item.maxPrice}" placeholder="最高价格"/>-->
-<!--                                    </div>-->
-<!--                                    <div class="col-sm-2 m-b-xs">-->
-<!--                                        <button class="btn btn-primary btn-block" type="submit"><i class="fa fa-search"></i>&nbsp;&nbsp;&nbsp;&nbsp;<strong>搜索</strong></button>-->
-<!--                                    </div>-->
-<!--                                    <div class="col-sm-2 m-b-xs">-->
-<!--                                        <a th:href="@{'download1'}" class="btn btn-primary btn-block" >&nbsp;&nbsp;&nbsp;&nbsp;<strong>导出</strong></a>-->
-<!--                                    </div>-->
-<!--                                </div>-->
-<!--                            </form>-->
                             <div class="row">
                                 <div class="col-sm-6 m-b-xs">
-                                    <a th:href="@{addRegion}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="left" title="" data-original-title="Refresh inbox"><i class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;&nbsp;新增商品&nbsp;&nbsp;&nbsp;&nbsp;</a>
+                                    <a th:href="@{addRegion}" class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="left" title="" data-original-title="Refresh inbox"><i class="fa fa-plus"></i>&nbsp;&nbsp;&nbsp;&nbsp;新增停车区域&nbsp;&nbsp;&nbsp;&nbsp;</a>
                                 </div>
                                 <div class="col-sm-6 m-b-xs">
-                                </div>
+                                    <form action="/addRegions" enctype="multipart/form-data" method="post">
+                                        <input class="btn btn-primary btn-sm" data-toggle="tooltip" data-placement="left" title="" data-original-title="Refresh inbox" type="file" name="file">
+                                        <input class="btn btn-primary btn-sm" data-toggle="tooltip"  title="" data-original-title="Refresh inbox" type="submit">
+                                    </form>
                             </div>
+
 
                         </div>
                     </div>
@@ -91,7 +69,7 @@
                 <div class="col-lg-12">
                     <div class="ibox float-e-margins">
                         <div class="ibox-title">
-                            <h5>商品列表</h5>
+                            <h5>停车区域列表</h5>
                             <div class="ibox-tools">
                                 <a class="collapse-link">
                                     <i class="fa fa-chevron-up"></i>
@@ -104,26 +82,20 @@
                                     <thead>
                                     <tr>
                                         <th width="5%">ID</th>
-                                        <th width="39%">坐标</th>
-                                        <th width="8%">分类</th>
-                                        <th width="8%">价格</th>
-                                        <th width="15%">库存数量</th>
-                                        <th width="15%">更新时间</th>
-                                        <!--<th width="10%">推荐状态</th>-->
-                                        <th>操作</th>
+                                        <th width="64%">坐标</th>
+                                        <th width="8%">停车区域名称</th>
+                                        <th width="8%">容量</th>
+                                        <th width="15%">操作</th>
                                     </tr>
                                     </thead>
                                     <tbody>
                                     <tr th:each="region : ${regionList}">
                                         <td th:text="${region.parkingRegionId}">Onions</td>
                                         <td th:text="${region.parkingRegionLongLati}">Onions</td>
-
                                         <td th:text="${region.parkingRegionName}">Onions</td>
                                         <td th:text="${region.parkingRegionCapacity}">Onions</td>
-
-
                                         <td>
-                                            <a th:href="@{'displayWithMap?id='+${region.parkingRegionId}}" title="修改"><i class="fa fa-edit text-navy"></i></a>
+                                            <a th:href="@{'displayWithMap?id='+${region.parkingRegionId}}" title="展示"><i class="fa fa-edit text-navy"></i></a>
                                             <a th:href="@{'regionEdit?id='+${region.parkingRegionId}}" title="修改"><i class="fa fa-edit text-navy"></i></a>
                                             &nbsp;&nbsp;&nbsp;&nbsp;
                                             <a href="#" th:onclick="'javascript:updateState('+${region.parkingRegionId}+',2,0);'" title="删除"><i class="fa fa-trash-o text-navy"></i></a>

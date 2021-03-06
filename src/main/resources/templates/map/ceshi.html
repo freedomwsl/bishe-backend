@@ -193,7 +193,6 @@
         });
         local.search(myValue);
     }
-
     // ------------------新项目----------------------------
     function findParking() {
         riding.search(beginLocation, endLocation);
@@ -215,7 +214,7 @@
             }
         });
     }
-
+    // 绘制停车区域
     function drawRegions(e) {
         var var1 = e;
         var var2 = JSON.parse(var1.parkingRegionLongLati);
@@ -298,11 +297,15 @@
         //     })
         // }
     };
+    var tempMaker;
     function showInfo2(e) {
         // map.clearOverlays();    //清除地图上所有覆盖物
+        if(tempMaker!=null){
+            map.removeOverlay(tempMaker);
+        }
         stopBikeLocation = e.point;
-        var marker = new BMap.Marker(e.point); // 创建标注
-        map.addOverlay(marker);
+        tempMaker = new BMap.Marker(e.point); // 创建标注
+        map.addOverlay(tempMaker);
         // alert('点击位置经纬度：' + e.latlng.lng + ',' + e.latlng.lat);
     };
     function stopBikePoint(){

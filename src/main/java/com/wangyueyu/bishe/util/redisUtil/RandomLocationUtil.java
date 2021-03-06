@@ -84,4 +84,17 @@ public class RandomLocationUtil {
         returnDoubles.add(centerLati*2);
         return returnDoubles;
     }
+
+    /**
+     * 12.2222,23.1111格式字符串经纬度转List<double>
+     */
+    public static List<Double> stringToDoubleList(String longlati){
+        final List<Double> doubles = new ArrayList<>();
+        final String[] split = longlati.split(",");
+        final double lng = Double.parseDouble(split[0]);
+        final double lat = Double.parseDouble(split[1]);
+        doubles.add(lng);
+        doubles.add(lat);
+        return doubles;
+    }
 }
