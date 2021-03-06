@@ -74,4 +74,8 @@ public class RedirectController {
     public String testArea(){
         return "/map/testArea";
     }
+    @GetMapping("/testDashBoard")
+    public String testDashBoard(){
+        return "testDashBoard";
+    }
 }

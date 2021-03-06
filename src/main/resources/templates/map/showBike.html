@@ -53,7 +53,7 @@
                         height: 100,     // 信息窗口高度
                         title : var11.bikeId , // 信息窗口标题
                     }
-                    var var6="上次使用时间："+var11.lastUse+"是否正在被使用："+var11.isUsing+"被使用次数"
+                    var var6="上次使用时间："+var11.gmtModified+"是否正在被使用："+var11.isUsing+"被使用次数"
                     var infoWindow = new BMapGL.InfoWindow(var6, opts);  // 创建信息窗口对象
                     marker2.addEventListener("click", function(){
                         this.openInfoWindow(infoWindow, point); //开启信息窗口
