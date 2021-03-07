@@ -184,6 +184,16 @@ public class RegionController {
 
         return responseEntity ;
     }
+    @DeleteMapping("/user/regionDelete")
+    @ResponseBody
+    public R deleteRegion(@RequestParam Integer id){
+        logger.info("{}",id);
+        final ParkingRegion parkingRegion = new ParkingRegion();
+        parkingRegion.setParkingRegionId(id);
+        regionService.removeById(parkingRegion);
+        regionService.removeRedis(id);
+        return R.success();
+    }
 
 
 }

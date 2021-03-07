@@ -29,4 +29,6 @@ public interface ParkingRegionService extends IService<ParkingRegion> {
     List<ParkingRegion> getRegionsByHotParkingPlace(List<Double> doubles);
 
     Boolean saveRegionsByExcel(MultipartFile file) throws IOException, InvalidFormatException;
+
+    void removeRedis(Integer id);
 }

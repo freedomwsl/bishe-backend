@@ -224,6 +224,4 @@ public class Bike1Controller {
         logger.info("{}",list);
         return R.success().data("list",list);
     }
-
-
 }

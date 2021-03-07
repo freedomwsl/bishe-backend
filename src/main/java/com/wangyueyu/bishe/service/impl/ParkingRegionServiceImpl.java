@@ -193,6 +193,14 @@ public class ParkingRegionServiceImpl extends ServiceImpl<ParkingRegionMapper, P
         return Boolean.TRUE;
     }
 
+    @Override
+    public void removeRedis(Integer id) {
+        final Long remove = redisTemplate.opsForGeo().remove(GeoHashKey.REGION_REDIS_KEY, id.toString());
+        log.info("removeregion: {}",remove);
+        final Long delete = redisTemplate.opsForHash().delete(GeoHashKey.REGION_DETAIL_REDIS_KEY, id.toString());
+        log.info("delete:{}",delete);
+    }
+
 
     private static void inputStreamToFile(InputStream ins, File file) {
         try {

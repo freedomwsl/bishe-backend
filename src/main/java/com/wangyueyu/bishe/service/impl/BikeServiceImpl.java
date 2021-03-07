@@ -77,4 +77,5 @@ public class BikeServiceImpl extends ServiceImpl<BikeMapper, Bike> implements Bi
         List<Bike> list=bikeMapper.getBikesByTime();
         return list;
     }
+
 }

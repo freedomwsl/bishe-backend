@@ -106,9 +106,6 @@
                                                 <td>
                                                     <a th:href="@{'displayWithMap?id='+${region.parkingRegionId}}"
                                                        title="展示"><i class="fa fa-edit text-navy"></i></a>
-                                                    <a th:href="@{'regionEdit?id='+${region.parkingRegionId}}"
-                                                       title="修改"><i class="fa fa-edit text-navy"></i></a>
-                                                    &nbsp;&nbsp;&nbsp;&nbsp;
                                                     <a href="#"
                                                        th:onclick="'javascript:updateState('+${region.parkingRegionId}+',2,0);'"
                                                        title="删除"><i class="fa fa-trash-o text-navy"></i></a>
@@ -174,8 +171,8 @@
                 }
                 if (deleteTag) {
                     $.ajax({
-                        type: "POST",
-                        url: "bikeEditState?id=" + id,
+                        type: "DELETE",
+                        url: "regionDelete?id=" + id,
                         contentType: "application/json; charset=utf-8",
                         success: function (msg) {
                             window.location.reload();
