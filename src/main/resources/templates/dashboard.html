@@ -159,7 +159,10 @@
             console.log("xxx");
             map.addOverlay(marker2);
         } else {
-            var marker2 = new BMapGL.Marker(trackPoint2[0]);  // 创建标注
+            var myIcon = new BMapGL.Icon("/img/bike/单车停放区.png", new BMapGL.Size(48,48));
+            var marker2 = new BMapGL.Marker(trackPoint2[0],{
+                icon: myIcon
+            });  // 创建标注
             map.addOverlay(marker2);
         }
 

@@ -57,7 +57,9 @@ public class RegionController {
         //创建page对象
         Page<ParkingRegion> page = new Page<>(pageCurrent, pageSize);
         //调用方法实现分页
-        regionService.page(page, null);
+        final QueryWrapper<ParkingRegion> wrapper = new QueryWrapper<>();
+        wrapper.orderByDesc("gmt_create");
+        regionService.page(page, wrapper);
         //调用方法时候，底层封装，把分页所有数据封装到pageTeacher对象里面
         long total = page.getTotal();//总记录数
         List<ParkingRegion> regionList = page.getRecords(); //数据list集合

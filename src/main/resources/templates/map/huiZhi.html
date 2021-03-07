@@ -277,9 +277,9 @@
                 url: "/user/addRegion",
                 data: JSON.stringify(parkingRegion),
                 contentType: "application/json;charset=utf-8",
-                dataType: "application/json",
+                dataType: "json",
                 success: function (respMsg) {
-                    alert(respMsg);
+                    window.location.href="/user/regionManage_0_0_0";
                 }
             });
             map.clearOverlays();
