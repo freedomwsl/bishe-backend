@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * <p>
@@ -31,4 +32,6 @@ public interface ParkingRegionService extends IService<ParkingRegion> {
     Boolean saveRegionsByExcel(MultipartFile file) throws IOException, InvalidFormatException;
 
     void removeRedis(Integer id);
+
+    Map<String, Object> getAllByLngLat(ArrayList<Double> doubles);
 }

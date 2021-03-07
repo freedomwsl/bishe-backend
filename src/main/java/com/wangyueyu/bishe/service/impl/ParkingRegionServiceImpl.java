@@ -1,9 +1,14 @@
 package com.wangyueyu.bishe.service.impl;
 
 import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
+import com.wangyueyu.bishe.entity.Bike;
+import com.wangyueyu.bishe.entity.HotParking;
+import com.wangyueyu.bishe.entity.ParkingPlace;
 import com.wangyueyu.bishe.entity.ParkingRegion;
 import com.wangyueyu.bishe.entity.constant.GeoHashKey;
 import com.wangyueyu.bishe.mapper.ParkingRegionMapper;
+import com.wangyueyu.bishe.service.HotParkingService;
+import com.wangyueyu.bishe.service.ParkingPlaceService;
 import com.wangyueyu.bishe.service.ParkingRegionService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.wangyueyu.bishe.util.redisUtil.RandomLocationUtil;
@@ -20,10 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.function.LongToIntFunction;
 
 /**
@@ -41,6 +43,10 @@ public class ParkingRegionServiceImpl extends ServiceImpl<ParkingRegionMapper, P
     public static final String REGION_DETAIL_REDIS_KEY = "parkingRegionDetail";
     @Autowired
     private RedisTemplate redisTemplate;
+    @Autowired
+    private HotParkingService hotParkingService;
+    @Autowired
+    private ParkingPlaceService parkingPlaceService;
 
     @Override
     public void saveToRedisAndMysql(ParkingRegion parkingRegion) {
@@ -199,6 +205,50 @@ public class ParkingRegionServiceImpl extends ServiceImpl<ParkingRegionMapper, P
         log.info("removeregion: {}",remove);
         final Long delete = redisTemplate.opsForHash().delete(GeoHashKey.REGION_DETAIL_REDIS_KEY, id.toString());
         log.info("delete:{}",delete);
+    }
+
+    @Override
+    public Map<String, Object> getAllByLngLat(ArrayList<Double> lonAndLati) {
+        final HashMap<String, Object> allData = new HashMap<>();
+        Double longitude = lonAndLati.get(0);
+        Double latitude = lonAndLati.get(1);
+        log.info("lng,lat: {},{}", longitude, latitude);
+        RedisGeoCommands.GeoRadiusCommandArgs args =
+                RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeDistance().sortAscending();
+        Distance radius = new Distance(0.2, Metrics.KILOMETERS);
+        Point point = new Point(longitude, latitude);
+        GeoResults<RedisGeoCommands.GeoLocation<String>> redis = redisTemplate.opsForGeo().radius(GeoHashKey.BIKE_REDIS_KEY, new Circle(point, radius), args);
+        List<GeoResult<RedisGeoCommands.GeoLocation<String>>> list = redis.getContent();
+        List<Bike> bikeList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(list)) {
+            for (GeoResult<RedisGeoCommands.GeoLocation<String>> geo : list) {
+                String bikeId = geo.getContent().getName();
+                Bike bike = (Bike) redisTemplate.opsForHash().get(GeoHashKey.BIKE_DETAIL_REDIS_KEY, bikeId);
+                bikeList.add(bike);
+            }
+        }
+        allData.put("bikes",bikeList);
+        RedisGeoCommands.GeoRadiusCommandArgs regionArgs =
+                RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeDistance().limit(10).sortAscending();
+        Distance regionRadius = new Distance(0.3, Metrics.KILOMETERS);
+        Point regionPoint = new Point(longitude, latitude);
+        GeoResults<RedisGeoCommands.GeoLocation<String>> regionRedis =
+                redisTemplate.opsForGeo().radius(GeoHashKey.REGION_REDIS_KEY, new Circle(regionPoint, regionRadius), regionArgs);
+        log.info("redis{}", regionRedis);
+        List<GeoResult<RedisGeoCommands.GeoLocation<String>>> tempList = regionRedis.getContent();
+        final ArrayList<ParkingRegion> regionList = new ArrayList<>();
+        if (CollectionUtils.isNotEmpty(tempList)) {
+            for (GeoResult<RedisGeoCommands.GeoLocation<String>> regionGeo : tempList) {
+                String regionId = regionGeo.getContent().getName();
+                log.info("++++++++++++++++++++++:{}",regionId);
+                ParkingRegion region = (ParkingRegion) redisTemplate.opsForHash().get(GeoHashKey.REGION_DETAIL_REDIS_KEY, regionId);
+                regionList.add(region);
+            }
+        }
+        allData.put("regionList",regionList);
+        final List<ParkingPlace> parkingPlaceList = parkingPlaceService.list(null);
+        allData.put("hotParkingList",parkingPlaceList);
+        return allData;
     }
 
 

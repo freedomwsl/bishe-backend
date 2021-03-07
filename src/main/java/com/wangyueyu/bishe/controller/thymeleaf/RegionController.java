@@ -34,10 +34,7 @@ import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * description
@@ -193,6 +190,20 @@ public class RegionController {
         regionService.removeById(parkingRegion);
         regionService.removeRedis(id);
         return R.success();
+    }
+
+    /**
+     * dashboard获取所有的数据
+     * @return
+     */
+    @GetMapping("/getAll/{lng}/{lat}")
+    @ResponseBody
+    public R getAll(@PathVariable Double lng,@PathVariable Double lat){
+        ArrayList<Double> doubles = new ArrayList<>();
+        doubles.add(lng);
+        doubles.add(lat);
+        Map<String,Object> allData = regionService.getAllByLngLat(doubles);
+        return R.success().data(allData);
     }
 
 
