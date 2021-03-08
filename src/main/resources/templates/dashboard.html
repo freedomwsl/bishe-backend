@@ -85,7 +85,9 @@
                 for (var k = 0; k < respMsg.data.regionList.length; k++) {
                     drawRegions(respMsg.data.regionList[k]);
                 }
-                drawParkingPlace(respMsg);
+                for (var k = 0; k < respMsg.data.hotParkingList.length; k ++){
+                    drawParkingPlace(respMsg.data.hotParkingList[k]);
+                }
             }
         });
     }
@@ -204,8 +206,7 @@
         // }
     };
     function drawParkingPlace(respMsg){
-        for (var k = 0; k < respMsg.data.hotParkingList.length; k ++) {
-            var var11 = respMsg.data.hotParkingList[k];
+            var var11 = respMsg;
             console.log(var11);
             var var1 = var11.parkingPlaceLongLati;
             var var2 = var1.split(",");
@@ -225,16 +226,14 @@
                 height: 170,     // 信息窗口高度
                 title : var11.parkingPlaceName , // 信息窗口标题
             }
-            // var var6="热点停车点id："+var11.hotParkingId+"</br>停车地点名称"+var11.parkingPlaceName+
-            //     "</br>时间："+var11.hotBeginTime+"--"+var11.hotFinalTime+
-            //     "</br>坐标："+var11.parkingPlaceLongLati+"</br>热点类型："+var11.parkingPlaceType+
-            //     "</br>热点原因: "+var11.hotReason;
-            // var infoWindow = new BMapGL.InfoWindow(var6, opts);  // 创建信息窗口对象
-            // marker2.addEventListener("click", function(){
-            //     this.openInfoWindow(infoWindow, point); //开启信息窗口
-            // });
+            var var6="热点停车点id："+var11.parkingPlaceId+"</br>停车地点名称: "+var11.parkingPlaceName+
 
-        }
+                "</br>坐标："+var11.parkingPlaceLongLati+"</br>热点类型："+var11.parkingPlaceType;
+
+            var infoWindow = new BMapGL.InfoWindow(var6, opts);  // 创建信息窗口对象
+            marker2.addEventListener("click", function(){
+                this.openInfoWindow(infoWindow, point); //开启信息窗口
+            });
     }
 </script>
 

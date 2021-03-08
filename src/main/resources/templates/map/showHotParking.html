@@ -40,40 +40,46 @@
                 drawRegions(respMsg.data.regionList[k]);
             }
             // 画热点停车点
-
             for (var k = 0; k < respMsg.data.hotParkingList.length; k ++) {
-                var var11 = respMsg.data.hotParkingList[k];
-                console.log(var11);
-                var var1 = var11.parkingPlaceLongLati;
-                var var2 = var1.split(",");
-                var var3 = var2[0];
-                var var4 = var2[1];
-                var var5 = [];
-                var5.push(new BMapGL.Point(parseFloat(var3),parseFloat(var4)));
-                console.log(var5);
-                // var marker2 = new BMap.Marker(var5[0]);  // 创建标注
-                var myIcon = new BMapGL.Icon("/img/bike/热点.png", new BMapGL.Size(48, 48));
-                marker2 = new BMapGL.Marker(var5[0], {
-                    icon: myIcon
-                });
-                map.addOverlay(marker2);
-                var opts = {
-                    width : 200,     // 信息窗口宽度
-                    height: 170,     // 信息窗口高度
-                    title : var11.parkingPlaceName , // 信息窗口标题
-                }
-                var var6="热点停车点id："+var11.hotParkingId+"</br>停车地点名称"+var11.parkingPlaceName+
-                        "</br>时间："+var11.hotBeginTime+"--"+var11.hotFinalTime+
-                    "</br>坐标："+var11.parkingPlaceLongLati+"</br>热点类型："+var11.parkingPlaceType+
-                    "</br>热点原因: "+var11.hotReason;
-                var infoWindow = new BMapGL.InfoWindow(var6, opts);  // 创建信息窗口对象
-                marker2.addEventListener("click", function(){
-                    this.openInfoWindow(infoWindow, point); //开启信息窗口
-                });
-
+                drawParkingPlace(respMsg.data.hotParkingList[k]);
             }
         }
     });
+    function drawParkingPlace(e){
+        var var11 = e;
+        console.log(var11);
+        var var1 = var11.parkingPlaceLongLati;
+        var var2 = var1.split(",");
+        var var3 = var2[0];
+        var var4 = var2[1];
+        var var5 = [];
+        var marker2;
+        var5.push(new BMapGL.Point(parseFloat(var3),parseFloat(var4)));
+        console.log(var5);
+        // var marker2 = new BMap.Marker(var5[0]);  // 创建标注
+        var myIcon = new BMapGL.Icon("/img/bike/热点.png", new BMapGL.Size(48, 48));
+        marker2 = new BMapGL.Marker(var5[0], {
+            icon: myIcon
+        });
+        map.addOverlay(marker2);
+        var opts = {
+            width : 200,     // 信息窗口宽度
+            height: 170,     // 信息窗口高度
+            title : var11.parkingPlaceName , // 信息窗口标题
+        }
+        console.log("var11:",var11);
+        var6="热点停车点id："+var11.hotParkingId+"</br>停车地点名称"+var11.parkingPlaceName+
+            "</br>时间："+var11.hotBeginTime+"--"+var11.hotFinalTime+
+            "</br>坐标："+var11.parkingPlaceLongLati+"</br>热点类型："+var11.parkingPlaceType+
+            "</br>热点原因: "+var11.hotReason;
+        console.log("var6:",var6);
+
+        var infoWindow = new BMapGL.InfoWindow(var6, opts);  // 创建信息窗口对象
+        marker2.addEventListener("click", function(){
+            this.openInfoWindow(infoWindow); //开启信息窗口
+        });
+
+    }
     function drawRegions(e) {
         var var1 = e;
         var var2 = JSON.parse(var1.parkingRegionLongLati);
@@ -105,7 +111,6 @@
         var trackPoint2 = [];
         trackPoint2.push(new BMapGL.Point(longZhong, latiZhong));
         var marker2;
-        console.log("isrecommen" + e.isRecommend);
         if (e.isRecommend == "Y") {
             console.log("进来了---------------------------------");
             var myIcon = new BMap.Icon("/img/bike/红包.png", new BMapGL.Size(50, 50));
@@ -126,7 +131,7 @@
             "<label>停车区域已使用容量：</label><p style='margin:0;line-height:1.5;font-size:13px;text-indent:2em'>" + var1.usedCapacity + "</p>" +
             "</div>";
         var infoWindow = new BMapGL.InfoWindow(sContent);
-        marker2.addEventListener('mouseover', function () {
+        marker2.addEventListener('click', function () {
             this.openInfoWindow(infoWindow);
         });
 
