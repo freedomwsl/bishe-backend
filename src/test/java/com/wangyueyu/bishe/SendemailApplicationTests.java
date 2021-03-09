@@ -27,10 +27,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
-
+import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -98,21 +99,21 @@ public class SendemailApplicationTests {
      */
     @Test
     public void initialBike() {
-        ArrayList<Bike> list = new ArrayList<>();
-        for (int i = 0; i < 100; i++) {
-            Bike bike = new Bike();
-            bike.setBeginTime(new Date());
-            String s = RandomLocationUtil.randomLonLat("113.557471,34.836515", 0.5, 0.5);
-            String substring = s.substring(1, s.length() - 1);
-            bike.setLongLati(substring);
-            Random random = new Random();
-            int times = random.nextInt(50);
-            bike.setUsedTimes(times);
-            String flag = times % 2 == 0 ? "Y" : "N";
-            bike.setIsUsing(flag);
-            list.add(bike);
-        }
-        bikeService.saveBatch(list);
+//        ArrayList<Bike> list = new ArrayList<>();
+//        for (int i = 0; i < 100; i++) {
+//            Bike bike = new Bike();
+//            bike.setBeginTime(new Date());
+//            String s = RandomLocationUtil.randomLonLat("113.557471,34.836515", 0.5, 0.5);
+//            String substring = s.substring(1, s.length() - 1);
+//            bike.setLongLati(substring);
+//            Random random = new Random();
+//            int times = random.nextInt(50);
+//            bike.setUsedTimes(times);
+//            String flag = times % 2 == 0 ? "Y" : "N";
+//            bike.setIsUsing(flag);
+//            list.add(bike);
+//        }
+//        bikeService.saveBatch(list);
         // 取出mysql所有的同步到redis
         List<Bike> bikeList = bikeService.list(null);
         for (Bike bike : bikeList) {
@@ -198,6 +199,27 @@ public class SendemailApplicationTests {
         }
 
 
+    }
+
+    @Test
+    public void testMap(){
+        final HashMap<String, String> map = new HashMap<>();
+
+
+//        map.put("1","11,11,11,11,11");
+//        map.put("2","22,22,22,22,22");
+//        final ArrayList<Person> list = new ArrayList<Person>(){{
+//            map.forEach((str1,str2)->
+//                Arrays.asList(str2.split(",")).forEach(str3->add(new Person(str3,str1))))
+//
+//            }
+//        }.stream().sorted(Comparator.comparing(Person::getName)).collect(Collectors.toList());
+//
+
+    }
+    @Test
+    public void getHeat(){
+        bikeService.getHeat();
     }
 }
 

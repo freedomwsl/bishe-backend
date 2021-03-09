@@ -40,6 +40,27 @@ public class RandomLocationUtil {
         return s;
     }
 
+    public static List<Double> randomLnglat(String lngAndLat,Double length,Double width) {
+        String substring = lngAndLat.substring(0, lngAndLat.length() - 1);
+        String[] split = substring.split(",");
+        double lng1 = Double.parseDouble(split[0]);
+        double lat1 = Double.parseDouble(split[1]);
+        double MinLon = lng1 - 0.01*length;
+        double MaxLon = lng1 + 0.01*length;
+        double MaxLat = lat1 + 0.005*width;
+        double MinLat = lat1 - 0.005*width;
+        Random random = new Random();
+        BigDecimal db = new BigDecimal(Math.random() * (MaxLon - MinLon) + MinLon);
+        Double lng = Double.valueOf(db.setScale(6, BigDecimal.ROUND_HALF_UP).toString());// 小数后6位
+        db = new BigDecimal(Math.random() * (MaxLat - MinLat) + MinLat);
+        Double lat = Double.valueOf(db.setScale(6, BigDecimal.ROUND_HALF_UP).toString());
+        List<Double> doubles = new ArrayList<>();
+        doubles.add(lng);
+        doubles.add(lat);
+        return doubles;
+    }
+
+
     /**
      * 处理百度地图格式的一串经纬度为double数组
      *

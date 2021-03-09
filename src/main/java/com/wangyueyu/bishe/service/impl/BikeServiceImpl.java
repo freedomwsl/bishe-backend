@@ -4,9 +4,11 @@ import com.baomidou.mybatisplus.core.toolkit.CollectionUtils;
 import com.wangyueyu.bishe.entity.Bike;
 import com.wangyueyu.bishe.entity.ParkingRegion;
 import com.wangyueyu.bishe.entity.constant.GeoHashKey;
+import com.wangyueyu.bishe.entity.vo.HeatVo;
 import com.wangyueyu.bishe.mapper.BikeMapper;
 import com.wangyueyu.bishe.service.BikeService;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.wangyueyu.bishe.util.redisUtil.RandomLocationUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.geo.*;
@@ -76,6 +78,40 @@ public class BikeServiceImpl extends ServiceImpl<BikeMapper, Bike> implements Bi
         log.info("xxxxxxxxxxxxxx");
         List<Bike> list=bikeMapper.getBikesByTime();
         return list;
+    }
+
+    @Override
+    public List<HeatVo> getHeat() {
+        ArrayList<HeatVo> heatVos = new ArrayList<HeatVo>();
+        for(int i=0;i<50;i++){
+            // 随机一个坐标
+            List<Double> doubles = RandomLocationUtil.randomLnglat("113.557471,34.836515", 0.5, 0.5);
+            Double longitude = doubles.get(0);
+            Double latitude = doubles.get(1);
+            log.info("{}{}", longitude, latitude);
+            // 查坐标附近的点数
+            RedisGeoCommands.GeoRadiusCommandArgs args =
+                    RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeDistance().sortAscending();
+            Distance radius = new Distance(0.2, Metrics.KILOMETERS);
+            Point point = new Point(longitude, latitude);
+            GeoResults<RedisGeoCommands.GeoLocation<String>> redis = redisTemplate.opsForGeo().radius(GeoHashKey.BIKE_REDIS_KEY, new Circle(point, radius), args);
+            log.info("redis{}", redis.getContent().size());
+            HeatVo heatVo = new HeatVo();
+            heatVo.setLng(doubles.get(0));
+            heatVo.setLat(doubles.get(1));
+            heatVo.setCount(redis.getContent().size());
+            heatVos.add(heatVo);
+//            List<GeoResult<RedisGeoCommands.GeoLocation<String>>> list = redis.getContent();
+//            List<Bike> bikeList = new ArrayList<>();
+//            if (CollectionUtils.isNotEmpty(list)) {
+//                for (GeoResult<RedisGeoCommands.GeoLocation<String>> geo : list) {
+//                    String bikeId = geo.getContent().getName();
+//                    Bike bike = (Bike) redisTemplate.opsForHash().get(GeoHashKey.BIKE_DETAIL_REDIS_KEY, bikeId);
+//                    bikeList.add(bike);
+//                }
+//            }
+        }
+        return heatVos;
     }
 
 }

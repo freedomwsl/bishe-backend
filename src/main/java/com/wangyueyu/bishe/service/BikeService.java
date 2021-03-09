@@ -2,6 +2,7 @@ package com.wangyueyu.bishe.service;
 
 import com.wangyueyu.bishe.entity.Bike;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.wangyueyu.bishe.entity.vo.HeatVo;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,4 +23,6 @@ public interface BikeService extends IService<Bike> {
     List<Bike> getBikesBylnglat(ArrayList<Double> doubles);
 
     List<Bike> getBikesByTime();
+
+    List<HeatVo> getHeat();
 }

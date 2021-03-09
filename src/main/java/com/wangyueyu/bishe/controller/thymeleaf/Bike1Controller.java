@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.wangyueyu.bishe.entity.*;
 import com.wangyueyu.bishe.entity.vo.AddBikeVo;
+import com.wangyueyu.bishe.entity.vo.HeatVo;
 import com.wangyueyu.bishe.entity.vo.HotParkingDTO;
 import com.wangyueyu.bishe.entity.vo.HotParkingVO;
 import com.wangyueyu.bishe.service.BikeService;
@@ -209,6 +210,10 @@ public class Bike1Controller {
         for(int i=0;i<addBikeVo.getBikeNumber();i++){
             Bike bike = new Bike();
             bike.setLongLati(addBikeVo.getBikeLocation());
+            bike.setIsUsing("N");
+            bike.setBeginTime(new Date());
+            bike.setLastUse(new Date());
+            bike.setUsedTimes(0);
             bikes.add(bike);
         }
         final boolean b = bikeService.saveBatch(bikes);
@@ -223,5 +228,11 @@ public class Bike1Controller {
         final List<UcenterMember> list = ucenterMemberService.list(wrapper);
         logger.info("{}",list);
         return R.success().data("list",list);
+    }
+    @GetMapping("/getHeat")
+    @ResponseBody
+    public R getHeat(){
+        List<HeatVo> heatVoList = bikeService.getHeat();
+        return R.success().data("heatVo",heatVoList);
     }
 }
