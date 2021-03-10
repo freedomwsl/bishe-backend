@@ -26,4 +26,6 @@ public interface GeoHashKey {
      * 用户id与推荐停车点rediskey
      */
     String USERID_RECOMMEND_REDIS_KEY = "userIdRecommend";
+
+    String STOP_BIKE_LOCATION="stopBikeLocation";
 }

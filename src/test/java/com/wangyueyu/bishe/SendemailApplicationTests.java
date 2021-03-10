@@ -8,6 +8,7 @@ import com.wangyueyu.bishe.entity.Bike;
 import com.wangyueyu.bishe.entity.ParkingRegion;
 import com.wangyueyu.bishe.entity.ParkingRegionJobRecord;
 import com.wangyueyu.bishe.entity.constant.GeoHashKey;
+import com.wangyueyu.bishe.entity.vo.AwardPojo;
 import com.wangyueyu.bishe.entity.vo.HotParkingVO;
 import com.wangyueyu.bishe.mapper.BikeMapper;
 import com.wangyueyu.bishe.service.*;
@@ -27,6 +28,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -201,25 +203,131 @@ public class SendemailApplicationTests {
 
     }
 
+    private String encryptStr(String str, String channel){
+        final String TB = "TB";
+        final int ELEVEN = 11;
+        final int EIGHT = 8;
+        if(TB.equals(channel)){
+            return encryptStr(str);
+        }
+        else{
+            if(str.length() >= ELEVEN){
+                return str.substring(0, str.length() - 8) + "****" + str.substring(str.length() - 4, str.length());
+            }
+            else if(str.length() >= EIGHT){
+                return str.substring(0, str.length() - 4) + "****";
+            }else {
+                return str;
+            }
+        }
+    }
+    private String encryptStr(String str) {
+
+        final String GBK = "GBK";
+        final int TWO = 2;
+
+        String encryptStr = str;
+        try {
+            byte[] byteArr = str.getBytes(GBK);
+
+            int firstNum = 4;
+            int secondNum = 5;
+
+            int firstIndexInOriginal = 0;
+            int secondIndexInOriginal = 0;
+
+            List<Integer> index = new LinkedList<>();
+
+            for (int i = 0; i < byteArr.length; i++) {
+                if (!str.contains(new String(new byte[]{byteArr[i]}, GBK))) {
+                    if (i < firstNum) {
+                        firstIndexInOriginal--;
+                    }
+                    if (i < secondNum) {
+                        secondIndexInOriginal--;
+                    }
+                    index.add(i);
+                }
+            }
+
+            if (index.size() > 0 && index.size() == (str.getBytes(GBK).length - str.length()) * TWO) {
+                if (index.contains(firstNum)) {
+                    int firstIndexInByte = index.indexOf(firstNum);
+                    if (firstIndexInByte % TWO == 0) {
+                        secondNum++;
+                        secondIndexInOriginal--;
+                        firstIndexInOriginal = firstNum - (firstIndexInByte / TWO);
+                    } else {
+                        firstIndexInOriginal = firstNum - (firstIndexInByte / TWO) - 1;
+                    }
+                }
+                if (index.contains(secondNum)) {
+                    int secondInByte = index.indexOf(secondNum);
+                    if (secondInByte % TWO == 0) {
+                        secondIndexInOriginal = secondNum - (secondInByte / TWO);
+                    } else {
+                        secondIndexInOriginal = secondNum - (secondInByte / TWO) - 1;
+                    }
+                }
+            }
+
+            if (firstIndexInOriginal > 0) {
+                encryptStr = encryptStr.substring(0, firstIndexInOriginal) + "*" + encryptStr.substring
+                        (firstIndexInOriginal + 1, encryptStr.length());
+            } else if (str.length() > (firstNum + firstIndexInOriginal / TWO)) {
+                encryptStr = encryptStr.substring(0, firstNum + firstIndexInOriginal / TWO) + "*" + encryptStr.substring
+                        (firstNum + firstIndexInOriginal / TWO + 1, encryptStr.length());
+            }
+            if (secondIndexInOriginal > 0) {
+                encryptStr = encryptStr.substring(0, secondIndexInOriginal) + "*" + encryptStr.substring
+                        (secondIndexInOriginal + 1, encryptStr.length());
+            } else if (str.length() > (secondNum + secondIndexInOriginal / TWO)) {
+                encryptStr = encryptStr.substring(0, secondNum + secondIndexInOriginal / TWO) + "*" + encryptStr
+                        .substring(secondNum + secondIndexInOriginal / TWO + 1, encryptStr.length());
+            }
+        } catch (UnsupportedEncodingException e) {
+            return str;
+        }
+
+        return encryptStr;
+    }
+
     @Test
     public void testMap(){
+        Map<String, String> awardLists = new HashMap<>();
+        awardLists.put("1","[\"12\",\"dfsd\",\"sdfs\",\"sdfd\"]");
+        awardLists.put("2","[\"12\",\"54\"]");
+        String channel ="fkdsjld";
+
+        List<AwardPojo> awardPojos = new ArrayList<AwardPojo>() {{
+            awardLists.forEach((buyer, orderList) -> {
+                    JSONObject.parseArray(orderList, String.class).forEach(order ->
+                    add(new AwardPojo(buyer, order)));
+            });
+        }}.stream().sorted(Comparator.comparing(AwardPojo::getEcsOrderId)).collect(Collectors.toList());
+        for (AwardPojo awardPojo : awardPojos) {
+            System.out.println(awardPojo);
+        }
+
         final HashMap<String, String> map = new HashMap<>();
+        map.put("1","11,112,13,14,51");
+        map.put("2","22,28,27,26,23");
+        List<Person> list = new ArrayList<Person>(){
+            {
+                map.forEach((str1, str2) -> Arrays.asList(str2.split(",")).forEach(str3 -> add(new Person(str3, str1))));
+            }
+        }.stream().sorted(Comparator.comparing(Person::getName)).collect(Collectors.toList());
+        for (Person person : list) {
+            System.out.println(person);
+        }
 
-
-//        map.put("1","11,11,11,11,11");
-//        map.put("2","22,22,22,22,22");
-//        final ArrayList<Person> list = new ArrayList<Person>(){{
-//            map.forEach((str1,str2)->
-//                Arrays.asList(str2.split(",")).forEach(str3->add(new Person(str3,str1))))
-//
-//            }
-//        }.stream().sorted(Comparator.comparing(Person::getName)).collect(Collectors.toList());
-//
 
     }
     @Test
     public void getHeat(){
         bikeService.getHeat();
+        String [] strings={"11","22","33"};
+
     }
 }
 

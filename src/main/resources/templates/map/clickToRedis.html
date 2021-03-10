@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <title>地图单击拾取经纬度</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+    <style>
+        body,
+        html,
+        #container {
+            overflow: hidden;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            font-family: "微软雅黑";
+        }
+    </style>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script src="http://api.map.baidu.com/api?type=webgl&v=1.0&ak=IsP2hS57WxEhq9wGXOPRxpmqctE6RKTY"></script>
+</head>
+<body>
+<div id="container"></div>
+</body>
+</html>
+<script>
+    var map = new BMapGL.Map('container');
+    map.centerAndZoom(new BMapGL.Point(113.557471,34.836515), 17);
+    map.enableScrollWheelZoom(true);
+    map.addEventListener('click', function (e) {
+        $.ajax({
+            type: "GET",
+            url: "/saveToRedis/" + e.latlng.lng + "/" + e.latlng.lat,
+            dataType: "json",
+            success: function (respMsg) {
+
+            }
+        });
+    })
+</script>

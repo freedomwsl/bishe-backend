@@ -235,4 +235,10 @@ public class Bike1Controller {
         List<HeatVo> heatVoList = bikeService.getHeat();
         return R.success().data("heatVo",heatVoList);
     }
+    @GetMapping("/saveToRedis/{lng}/{lat}")
+    @ResponseBody
+    public R saveToRedis(@PathVariable Double lng,@PathVariable Double lat){
+        bikeService.saveToRedis(lng,lat);
+        return R.success();
+    }
 }

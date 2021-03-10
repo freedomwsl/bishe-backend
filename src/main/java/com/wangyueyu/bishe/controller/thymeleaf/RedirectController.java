@@ -78,4 +78,8 @@ public class RedirectController {
     public String testDashBoard(){
         return "testDashBoard";
     }
+    @GetMapping("map/clickToRedis")
+    public String clickToRedis(){
+        return "/map/clickToRedis";
+    }
 }

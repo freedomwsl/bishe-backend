@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 /**
  * <p>
@@ -112,6 +113,11 @@ public class BikeServiceImpl extends ServiceImpl<BikeMapper, Bike> implements Bi
 //            }
         }
         return heatVos;
+    }
+
+    @Override
+    public void saveToRedis(Double lng, Double lat) {
+        redisTemplate.opsForGeo().add(GeoHashKey.STOP_BIKE_LOCATION,new Point(lng,lat), UUID.randomUUID());
     }
 
 }
