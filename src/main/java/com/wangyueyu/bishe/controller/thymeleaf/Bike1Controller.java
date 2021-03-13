@@ -229,10 +229,10 @@ public class Bike1Controller {
         logger.info("{}",list);
         return R.success().data("list",list);
     }
-    @GetMapping("/getHeat")
+    @GetMapping("/getHeat/{stop}")
     @ResponseBody
-    public R getHeat(){
-        List<HeatVo> heatVoList = bikeService.getHeat();
+    public R getHeat(@PathVariable String stop){
+        List<HeatVo> heatVoList = bikeService.getHeat(stop);
         return R.success().data("heatVo",heatVoList);
     }
     @GetMapping("/saveToRedis/{lng}/{lat}")

@@ -82,7 +82,7 @@ public class BikeServiceImpl extends ServiceImpl<BikeMapper, Bike> implements Bi
     }
 
     @Override
-    public List<HeatVo> getHeat() {
+    public List<HeatVo> getHeat(String stop) {
         ArrayList<HeatVo> heatVos = new ArrayList<HeatVo>();
         for(int i=0;i<50;i++){
             // 随机一个坐标
@@ -95,7 +95,12 @@ public class BikeServiceImpl extends ServiceImpl<BikeMapper, Bike> implements Bi
                     RedisGeoCommands.GeoRadiusCommandArgs.newGeoRadiusArgs().includeDistance().sortAscending();
             Distance radius = new Distance(0.2, Metrics.KILOMETERS);
             Point point = new Point(longitude, latitude);
-            GeoResults<RedisGeoCommands.GeoLocation<String>> redis = redisTemplate.opsForGeo().radius(GeoHashKey.BIKE_REDIS_KEY, new Circle(point, radius), args);
+            GeoResults<RedisGeoCommands.GeoLocation<String>> redis;
+            if("stop".equals(stop)){
+                redis = redisTemplate.opsForGeo().radius(GeoHashKey.STOP_BIKE_LOCATION, new Circle(point, radius), args);
+            }else{
+                redis = redisTemplate.opsForGeo().radius(GeoHashKey.BIKE_REDIS_KEY, new Circle(point, radius), args);
+            }
             log.info("redis{}", redis.getContent().size());
             HeatVo heatVo = new HeatVo();
             heatVo.setLng(doubles.get(0));

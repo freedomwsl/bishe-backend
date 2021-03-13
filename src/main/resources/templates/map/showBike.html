@@ -36,30 +36,32 @@
             url: "/bike/showBike"+"/"+lng+"/"+lat,
             dataType: "json",
             success: function (respMsg) {
-                console.log("xxxxxxxxxxxxxxxxxxxxx");
-                console.log(respMsg.data.bikes.length);
+
                 for (var k = 0; k < respMsg.data.bikes.length; k ++) {
-                    var var11 = respMsg.data.bikes[k];
-                    var var1 = var11.longLati;
-                    var var2 = var1.split(",");
-                    var var3 = var2[0];
-                    var var4 = var2[1];
-                    var var5 = [];
-                    var5.push(new BMapGL.Point(parseFloat(var3),parseFloat(var4)));
-                    var marker2 = new BMapGL.Marker(var5[0]);  // 创建标注
-                    map.addOverlay(marker2);
-                    var opts = {
-                        width : 200,     // 信息窗口宽度
-                        height: 100,     // 信息窗口高度
-                        title : var11.bikeId , // 信息窗口标题
-                    }
-                    var var6="上次使用时间："+var11.gmtModified+"是否正在被使用："+var11.isUsing+"被使用次数"
-                    var infoWindow = new BMapGL.InfoWindow(var6, opts);  // 创建信息窗口对象
-                    marker2.addEventListener("click", function(){
-                        this.openInfoWindow(infoWindow, point); //开启信息窗口
-                    });
+                    showBike2(respMsg.data.bikes[k]);
                 }
             }
+        });
+    }
+    function showBike2(e){
+        var var11 = e;
+        var var1 = var11.longLati;
+        var var2 = var1.split(",");
+        var var3 = var2[0];
+        var var4 = var2[1];
+        var var5 = [];
+        var5.push(new BMapGL.Point(parseFloat(var3),parseFloat(var4)));
+        var marker2 = new BMapGL.Marker(var5[0]);  // 创建标注
+        map.addOverlay(marker2);
+        var opts = {
+            width : 200,     // 信息窗口宽度
+            height: 100,     // 信息窗口高度
+            title : var11.bikeId , // 信息窗口标题
+        }
+        var var6="bikeId:"+var11.bikeId+"<br/>上次使用时间："+var11.gmtModified+"<br/>是否正在被使用："+var11.isUsing+"被使用次数"
+        var infoWindow = new BMapGL.InfoWindow(var6, opts);  // 创建信息窗口对象
+        marker2.addEventListener("click", function(){
+            this.openInfoWindow(infoWindow, point); //开启信息窗口
         });
     }
 

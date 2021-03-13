@@ -24,7 +24,7 @@ public interface BikeService extends IService<Bike> {
 
     List<Bike> getBikesByTime();
 
-    List<HeatVo> getHeat();
+    List<HeatVo> getHeat(String stop);
 
     void saveToRedis(Double lng, Double lat);
 }

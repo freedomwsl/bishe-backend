@@ -77,7 +77,6 @@ public class RandomLocationUtil {
                 .replace("lat", "")
                 .replace("\"", "")
                 .replace(":", "");
-        System.out.println(replace);
         String[] split = replace.split(",");
         for (String s : split) {
             Double v = Double.parseDouble(s);

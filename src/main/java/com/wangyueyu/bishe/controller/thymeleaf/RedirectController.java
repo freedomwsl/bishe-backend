@@ -82,4 +82,9 @@ public class RedirectController {
     public String clickToRedis(){
         return "/map/clickToRedis";
     }
+
+    @GetMapping("/getStopHeat")
+    public String getStopHeat(){
+        return "/map/getStopHeat";
+    }
 }

@@ -20,11 +20,14 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.data.geo.*;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -57,6 +60,8 @@ public class SendemailApplicationTests {
     private ParkingRegionJobRecordService parkingRegionJobRecordService;
     @Autowired
     private HotParkingService hotParkingService;
+    @Qualifier("taskExecutor")
+    private TaskExecutor taskExecutor;
 
     /**
      * 测试发送文本邮件
@@ -164,44 +169,85 @@ public class SendemailApplicationTests {
         System.out.println(equals);
     }
     @Test
+    @Transactional
     public void testExcel() throws IOException, InvalidFormatException {
         Workbook workbook = WorkbookFactory.create(new File("F:\\工作簿1.xlsx"));
-        System.out.println("sheets" + workbook.getNumberOfSheets());
         //获取一张表
         Sheet sheet = workbook.getSheetAt(0);
-        System.out.println(sheet.getLastRowNum());
+        List<ParkingRegion> parkingRegions = new ArrayList<>();
         for (int i=1;i<=sheet.getLastRowNum()-1;i++) {//跳过第一行
             Row row=sheet.getRow(i);//取得第i行数据
-            System.out.println("----------"+row.getLastCellNum());
             String [] str=new String[row.getLastCellNum()];
             for (int j=0;j<row.getLastCellNum();j++) {
                 Cell cell=row.getCell(j);//取得第j列数据
                 cell.setCellType(CellType.STRING);
                 str[j]=cell.getStringCellValue().trim();
-                System.out.print(str[j]+" ");
             }
             final ParkingRegion parkingRegion = new ParkingRegion();
             parkingRegion.setParkingRegionName(str[0]);
-            System.out.println(str[0]);
-            System.out.println(str[1]);
             parkingRegion.setParkingRegionCapacity(Integer.parseInt(str[1]));
-            System.out.println(str[1]);
             parkingRegion.setParkingRegionLongLati(str[2]);
-            System.out.println(str[2]);
             parkingRegion.setProvince(str[3]);
-            System.out.println(str[3]);
             parkingRegion.setCity(str[4]);
-            System.out.println(str[4]);
             parkingRegion.setStreet(str[5]);
-            System.out.println(str[5]);
             parkingRegion.setCenterLocation(RandomLocationUtil.getCenter(str[2]));
-            System.out.println(str[6]);
             parkingRegion.setUsedCapacity(0);
-            System.out.println(parkingRegion);
+            parkingRegions.add(parkingRegion);
+        }
+        // 测试批量插入和单个插入
+        long begin = System.currentTimeMillis();
+        for (ParkingRegion parkingRegion : parkingRegions) {
+            regionService.save(parkingRegion);
+        }
+        log.info("parkingRegions.size(): {}",parkingRegions.size());
+        long end = System.currentTimeMillis();
+        log.info("单个插入用时：{}",end-begin);
+        long begin1 = System.currentTimeMillis();
+        regionService.saveBatch(parkingRegions);
+        long end1 = System.currentTimeMillis();
+        log.info("批量插入耗时：{}",end1-begin1);
+//        for(int i=0;i<parkingRegions.size()+500;i+=500){
+//            new Thread(()->{
+//
+//            });
+//        }
+        int i=10/0;
+
+
+
+        // 测试多线程
+
+
+
+
+    }
+
+    @Test
+    public void testThred(){
+        for(int i=0;i<5;i++){
+            taskExecutor.execute(()->{
+                System.out.println(Thread.currentThread().getName());
+            });
         }
 
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     private String encryptStr(String str, String channel){
         final String TB = "TB";
@@ -325,8 +371,14 @@ public class SendemailApplicationTests {
     }
     @Test
     public void getHeat(){
-        bikeService.getHeat();
+        bikeService.getHeat("stop");
         String [] strings={"11","22","33"};
+
+    }
+
+
+    @Test
+    public void testTaskRuner(){
 
     }
 }

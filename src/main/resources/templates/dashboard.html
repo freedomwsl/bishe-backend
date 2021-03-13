@@ -81,7 +81,9 @@
             contentType: "application/json;charset=utf-8",
             dataType: "json",
             success: function (respMsg) {
-                showAllBike(respMsg);
+                for (var k = 0; k < respMsg.data.bikes.length; k ++) {
+                    showAllBike(respMsg.data.bikes[k]);
+                }
                 for (var k = 0; k < respMsg.data.regionList.length; k++) {
                     drawRegions(respMsg.data.regionList[k]);
                 }
@@ -98,8 +100,7 @@
     });
 
     function showAllBike(respMsg){
-        for (var k = 0; k < respMsg.data.bikes.length; k ++) {
-            var var11 = respMsg.data.bikes[k];
+            var var11 = respMsg;
             var var1 = var11.longLati;
             var var2 = var1.split(",");
             var var3 = var2[0];
@@ -113,12 +114,11 @@
                 height: 100,     // 信息窗口高度
                 title : var11.bikeId , // 信息窗口标题
             }
-            var var6="上次使用时间："+var11.gmtModified+"是否正在被使用："+var11.isUsing+"被使用次数"
+            var var6="单车id:"+var11.bikeId+"<br/>上次使用时间："+var11.gmtModified+"<br/>是否正在被使用："+var11.isUsing+"被使用次数"
             var infoWindow = new BMapGL.InfoWindow(var6, opts);  // 创建信息窗口对象
             marker2.addEventListener("click", function(){
                 this.openInfoWindow(infoWindow, point); //开启信息窗口
             });
-        }
     }
     function drawRegions(e) {
         var var1 = e;
