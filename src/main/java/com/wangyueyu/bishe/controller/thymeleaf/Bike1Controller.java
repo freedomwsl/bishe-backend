@@ -54,7 +54,9 @@ public class Bike1Controller {
         //创建page对象
         Page<Bike> page = new Page<>(pageCurrent,pageSize);
         //调用方法实现分页
-        bikeService.page(page,null);
+        final QueryWrapper<Bike> wrapper = new QueryWrapper<>();
+        wrapper.orderByDesc("gmt_create");
+        bikeService.page(page,wrapper);
         //调用方法时候，底层封装，把分页所有数据封装到pageTeacher对象里面
         long total = page.getTotal();//总记录数
         List<Bike> bikeList = page.getRecords(); //数据list集合
@@ -73,8 +75,10 @@ public class Bike1Controller {
         if (pageCurrent == 0) pageCurrent = 1;
         //创建page对象
         Page<ParkingPlace> page = new Page<>(pageCurrent,pageSize);
+        final QueryWrapper<ParkingPlace> wrapper = new QueryWrapper<>();
+        wrapper.orderByDesc("gmt_create");
         //调用方法实现分页
-        parkingPlaceService.page(page,null);
+        parkingPlaceService.page(page,wrapper);
         //调用方法时候，底层封装，把分页所有数据封装到pageTeacher对象里面
         long total = page.getTotal();//总记录数
         List<ParkingPlace> parkingPlaces = page.getRecords(); //数据list集合

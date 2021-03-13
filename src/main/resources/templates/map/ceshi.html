@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
@@ -41,11 +41,11 @@
             z-index: 9999999999;
         }
     </style>
-    <script src="/js/umedit/ueditor.config.js"></script>
-    <script src="/js/umedit/ueditor.all.min.js"></script>
-    <script src="/js/umedit/lang/zh-cn/zh-cn.js"></script>
-    <script src="/js/jquery.min.js"></script>
-    <script include="bootstrap,widgets.alert" src="/js/include-web.js"></script>
+    <script th:src="@{/js/umedit/ueditor.config.js}"></script>
+    <script th:src="@{/js/umedit/ueditor.all.min.js}"></script>
+    <script th:src="@{/js/umedit/lang/zh-cn/zh-cn.js}"></script>
+    <script th:src="@{/js/jquery.min.js}"></script>
+    <script include="bootstrap,widgets.alert" th:src="@{/js/include-web.js}"></script>
     <script type="text/javascript"
             src="http://api.map.baidu.com/api?v=3.0&ak=IsP2hS57WxEhq9wGXOPRxpmqctE6RKTY"></script>
     <!--加载鼠标绘制工具-->
